@@ -1,0 +1,20 @@
+name: projects/antig-dave/locations/us-central1/authzPolicies/a2a-deny-unauthorized-policy
+action: DENY
+target:
+  resources:
+    - "projects/284046449012/locations/us-central1/gateways/a2a-coalition-gateway"
+httpRules:
+  - from:
+      sources:
+        - principals:
+            - principal:
+                exact: "agent://UNAUTHORIZED-PARTNER-99"
+            - principal:
+                exact: "agent://UNKNOWN-HOSTILE-01"
+    to:
+      operations:
+        - hosts:
+            - exact: "agentgateway.googleapis.com"
+            - exact: "us-central1-aiplatform.googleapis.com"
+          methods:
+            - "POST"

@@ -1,0 +1,5 @@
+googleManaged:
+  governedAccessPath: AGENT_TO_ANYWHERE
+registries:
+  - "//agentregistry.googleapis.com/projects/284046449012/locations/us-central1"
+description: "Gemini Enterprise Agent Platform Coalition Egress Gateway"

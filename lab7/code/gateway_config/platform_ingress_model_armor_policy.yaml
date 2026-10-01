@@ -1,0 +1,16 @@
+name: projects/antig-dave/locations/us-central1/authzPolicies/a2a-coalition-ingress-gateway-aisecurity-authzpolicy
+action: CUSTOM
+target:
+  resources:
+    - projects/antig-dave/locations/us-central1/agentGateways/a2a-coalition-ingress-gateway
+policyProfile: CONTENT_AUTHZ
+httpRules:
+  - to:
+      operations:
+        - paths:
+            - prefix: "/"
+    when: request.headers['content-type'] == 'application/json' || request.headers['content-type'].startsWith('text/')
+customProvider:
+  authzExtension:
+    resources:
+      - projects/antig-dave/locations/us-central1/authzExtensions/a2a-coalition-ingress-gateway-aisecurity-authzextension

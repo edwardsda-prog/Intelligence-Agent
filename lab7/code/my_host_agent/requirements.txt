@@ -1,0 +1,6 @@
+google-adk>=2.0.0
+google-genai>=1.0.0
+google-cloud-bigquery
+opentelemetry-api
+opentelemetry-sdk
+requests

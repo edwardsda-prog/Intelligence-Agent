@@ -1,0 +1,13 @@
+name: projects/antig-dave/locations/us-central1/authzPolicies/a2a-platform-deny-policy
+action: DENY
+target:
+  resources:
+    - "projects/antig-dave/locations/us-central1/agentGateways/a2a-coalition-agent-gateway"
+httpRules:
+  - from:
+      sources:
+        - principals:
+            - principal:
+                exact: "agent://UNAUTHORIZED-PARTNER-99"
+            - principal:
+                exact: "agent://UNKNOWN-HOSTILE-01"

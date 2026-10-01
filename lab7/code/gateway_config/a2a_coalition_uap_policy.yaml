@@ -1,0 +1,22 @@
+name: projects/antig-dave/locations/us-central1/authzPolicies/a2a-coalition-uap-policy
+action: ALLOW
+target:
+  resources:
+    - "projects/284046449012/locations/us-central1/gateways/a2a-coalition-gateway"
+httpRules:
+  - from:
+      sources:
+        - principals:
+            - principal:
+                exact: "agent://NATO-MARCOM-01"
+            - principal:
+                exact: "agent://UK-MOD-JOINT-01"
+            - principal:
+                exact: "agent://US-CENTCOM-01"
+    to:
+      operations:
+        - hosts:
+            - exact: "agentgateway.googleapis.com"
+            - exact: "us-central1-aiplatform.googleapis.com"
+          methods:
+            - "POST"

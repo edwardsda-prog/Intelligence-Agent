@@ -1,0 +1,9 @@
+name: projects/antig-dave/locations/us-central1/authzExtensions/a2a-coalition-ingress-gateway-aisecurity-authzextension
+service: modelarmor.us-central1.rep.googleapis.com
+failOpen: false
+timeout: 10s
+metadata:
+  model_armor_settings: '[{
+    "request_template_id": "projects/antig-dave/locations/us-central1/templates/mission_intel_request_armor",
+    "response_template_id": "projects/antig-dave/locations/us-central1/templates/mission_intel_response_armor"
+  }]'

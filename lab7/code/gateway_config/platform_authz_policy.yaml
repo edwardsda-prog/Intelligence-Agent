@@ -1,0 +1,15 @@
+name: projects/antig-dave/locations/us-central1/authzPolicies/a2a-platform-coalition-policy
+action: ALLOW
+target:
+  resources:
+    - "projects/antig-dave/locations/us-central1/agentGateways/a2a-coalition-agent-gateway"
+httpRules:
+  - from:
+      sources:
+        - principals:
+            - principal:
+                exact: "agent://NATO-MARCOM-01"
+            - principal:
+                exact: "agent://UK-MOD-JOINT-01"
+            - principal:
+                exact: "agent://US-CENTCOM-01"

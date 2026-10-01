@@ -1,0 +1,12 @@
+google-cloud-discoveryengine
+google-cloud-bigquery
+google-genai
+google-adk[otel-gcp,agent-identity]
+google-cloud-agentidentitycredentials
+mcp
+requests
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp
+
+
