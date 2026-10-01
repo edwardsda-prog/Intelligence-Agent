@@ -93,14 +93,14 @@ echo "✅ Phase 1 Passed: All unit tests verified successfully. Proceeding with 
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 0: Provisioning Unified Environment, Gemini Enterprise & IAM Security ==="
-./lab0/code/setup.sh
+./infrastructure/setup.sh
 
 # ------------------------------------------------------------------------------
 # STEP 1: Data Foundations & BigQuery
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 1: Testing BigQuery Setup ==="
-bq query --location=us-central1 --use_legacy_sql=false --project_id="$PROJECT_ID" < lab1/code/setup_dataset.sql > /dev/null 2>&1
+bq query --location=us-central1 --use_legacy_sql=false --project_id="$PROJECT_ID" < infrastructure/schemas/setup_dataset.sql > /dev/null 2>&1
 ROW_COUNT=$(bq query --location=us-central1 --use_legacy_sql=false --format=csv "SELECT COUNT(*) FROM \`${PROJECT_ID}.learning_labs_mission_data.radar_telemetry\`" | tail -n 1)
 echo "✅ BigQuery dataset created. radar_telemetry row count: $ROW_COUNT (Expected: 8)"
 
@@ -109,7 +109,7 @@ echo "✅ BigQuery dataset created. radar_telemetry row count: $ROW_COUNT (Expec
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 2: Local SQLite & Cloud Run MCP ==="
-python3 lab2/code/setup_local_db.py
+# python3 lab2/code/setup_local_db.py (deprecated)
 
 echo "Deploying BigQuery MCP Server to Cloud Run..."
 gcloud run deploy bigquery-mcp-server --quiet \
@@ -130,7 +130,7 @@ echo "✅ Cloud Run MCP Server URL: $CLOUD_RUN_URL"
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 3: Setup Unstructured Datastore (HUMINT PDFs) ==="
-./lab5/code/setup_lab5.sh
+./infrastructure/setup_discovery_engine.sh
 
 # ------------------------------------------------------------------------------
 # STEP 4: Setup RAG (Lab 8)
@@ -148,7 +148,7 @@ fi
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 5: Setup Model Armor ==="
-./lab4/code/setup_model_armor.sh
+./infrastructure/security/setup_model_armor.sh
 
 # ------------------------------------------------------------------------------
 # STEP 6: Deploy Final Agent

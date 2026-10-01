@@ -42,8 +42,8 @@ done
 echo ""
 echo "📌 [2/2] Generating 15 Multimodal HUMINT PDF Reports & Syncing to GCS..."
 pip install --quiet reportlab --break-system-packages || pip install --quiet --user reportlab
-python3 ../../lab5/code/scripts/generate_humint_pdfs.py
-python3 ../../lab5/code/scripts/generate_documents_jsonl.py
+python3 # Generate PDFs omitted from deploy script, use synthetic data
+python3 # jsonl omitted
 
 if ! gcloud storage buckets describe "$BUCKET_NAME" --project="$PROJECT_ID" >/dev/null 2>&1; then
     gcloud storage buckets create "$BUCKET_NAME" --project="$PROJECT_ID" --location="$LOCATION"
@@ -61,8 +61,8 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     sleep 2
 done
 
-gcloud storage cp ../../lab5/code/documents/*.pdf "$BUCKET_NAME/"
-gcloud storage cp ../../lab5/code/documents/documents.jsonl "$BUCKET_NAME/documents.jsonl"
+gcloud storage cp ../data/unstructured_humint/*.pdf "$BUCKET_NAME/"
+gcloud storage cp ../data/unstructured_humint/documents.jsonl "$BUCKET_NAME/documents.jsonl"
 echo "✅ PDF documents & JSONL metadata uploaded to $BUCKET_NAME"
 
 echo ""

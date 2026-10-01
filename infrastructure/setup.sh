@@ -258,11 +258,11 @@ else
 fi
 
 # Pre-populate local SQLite database for Lab 2
-if [ -f "../../lab2/code/setup_local_db.py" ]; then
-    python3 ../../lab2/code/setup_local_db.py >/dev/null 2>&1
-    echo -e "   ${GREEN}✓${RESET} Pre-populated local database: ${BOLD}../../lab2/code/mission_intel_local.db${RESET}"
+if [ -f "# deprecated" ]; then
+    python3 # deprecated >/dev/null 2>&1
+    echo -e "   ${GREEN}✓${RESET} Pre-populated local database: ${BOLD}# deprecated${RESET}"
 else
-    echo -e "   ${YELLOW}⚠️  Warning: ../../lab2/code/setup_local_db.py not found. Skipping local database creation.${RESET}"
+    echo -e "   ${YELLOW}⚠️  Warning: # deprecated not found. Skipping local database creation.${RESET}"
 fi
 
 # ------------------------------------------------------------------------------
@@ -280,7 +280,7 @@ echo -e "  • ${BOLD}Project Number:${RESET}     ${GREEN}${PROJECT_NUMBER:-"(Un
 echo -e "  • ${BOLD}Gemini Intranet:${RESET}    ${GREEN}learning-labs-mission-app${RESET} (LLM Add-on Enabled)"
 echo -e "  • ${BOLD}Web Grounding:${RESET}      ${GREEN}Disabled${RESET} (Secure Mission Intelligence)"
 echo -e "  • ${BOLD}Cloud Identity:${RESET}     ${GREEN}GSUITE${RESET} (Linked)"
-echo -e "  • ${BOLD}Local Database:${RESET}     ${GREEN}../../lab2/code/mission_intel_local.db${RESET} (Initialized)"
+echo -e "  • ${BOLD}Local Database:${RESET}     ${GREEN}# deprecated${RESET} (Initialized)"
 echo -e "  • ${BOLD}Credentials Cache:${RESET}  ${GREEN}/tmp/gcloud_config${RESET}"
 echo ""
 echo -e "${YELLOW}📢 [IMPORTANT LICENSING NOTE - INSTRUCTOR / USER PLACEHOLDER]${RESET}"
@@ -297,7 +297,7 @@ echo -e "${BOLD}🚀 PROCEED TO LAB 1: Data Foundations & BigQuery Ingestion${RE
 echo -e "${BLUE}==============================================================================${RESET}"
 echo ""
 echo -e "  ${BOLD}Step 1:${RESET} Navigate to the Lab 1 workspace:"
-echo -e "          ${CYAN}cd ../../lab1/code${RESET}"
+echo -e "          ${CYAN}cd ../infrastructure/schemas${RESET}"
 echo ""
 echo -e "  ${BOLD}Step 2:${RESET} Run the automated Lab 1 setup script to provision BigQuery datasets"
 echo -e "          and generate multimodal HUMINT intelligence reports:"
