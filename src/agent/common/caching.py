@@ -27,9 +27,9 @@ logger = logging.getLogger(__name__)
 # Minimum token threshold enforced by Vertex AI for Gemini Context Caching
 MINIMUM_CACHING_TOKEN_THRESHOLD = 32768
 
-# Static multi-domain dataset schema baseline (learning_labs_mission_data)
+# Static multi-domain dataset schema baseline (mission_data)
 DATASET_SCHEMA_PROMPT = """
-TABLE SCHEMAS & KEY COLUMNS FOR DATASET learning_labs_mission_data:
+TABLE SCHEMAS & KEY COLUMNS FOR DATASET mission_data:
 1. v_multi_domain_intelligence: Pre-joined unified view (track_id, target_id, radar_signature, ew_bearing, signal_frequency_ghz, prf_khz, emitter_type, cyber_actor, humint_content, friendly_unit).
 2. radar_telemetry: Radar tracks (track_id, platform_type, signature, target_id, velocity_knots, mgrs_coord, timestamp).
 3. ew_intercepts / ew_bearings: EW signals (ew_id, bearing_degrees, signal_frequency_ghz, prf_khz, emitter_type, threat_level, track_id, target_id, timestamp).

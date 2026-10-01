@@ -5,8 +5,8 @@ import re
 
 class TestSchemaParity(unittest.TestCase):
     """
-    Verifies DDL schema parity between local SQLite database (Lab 2)
-    and BigQuery multi-domain tables/view (Lab 1).
+    Verifies DDL schema parity between local SQLite database (Scenario 2)
+    and BigQuery multi-domain tables/view (Scenario 1).
     """
 
     @classmethod

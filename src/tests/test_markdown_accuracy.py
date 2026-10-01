@@ -4,7 +4,7 @@ import re
 import sys
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEST_FILE = os.path.join(REPO_ROOT, "tests", "test_all_labs_prompts.py")
+TEST_FILE = os.path.join(REPO_ROOT, "tests", "test_prompts.py")
 
 def load_test_file():
     with open(TEST_FILE, "r") as f:
@@ -15,7 +15,7 @@ def test_markdown_accuracy():
     all_passed = True
     
     for lab_num in range(2, 8):
-        guide_path = os.path.join(REPO_ROOT, f"lab{lab_num}", "guide.md")
+        guide_path = os.path.join(REPO_ROOT, f"scenario{lab_num}", "guide.md")
         if not os.path.exists(guide_path):
             continue
             
@@ -24,14 +24,14 @@ def test_markdown_accuracy():
             
         guide_prompts = set(re.findall(r'> \*"([^"]+)"\*', guide_content))
         
-        # Find p1, p2, p3 in test_content for this lab
+        # Find p1, p2, p3 in test_content for this scenario
         block_match = re.search(f'def run_lab{lab_num}_tests.*?(def run_lab|$)', test_content, re.DOTALL)
         if block_match:
             block = block_match.group(0)
             p_matches = re.findall(r'\bp[123]\s*=\s*"([^"]+)"', block)
             for p in p_matches:
                 if p not in guide_prompts:
-                    print(f"❌ [Lab {lab_num}] Test suite prompt NOT FOUND in guide.md: {p}")
+                    print(f"❌ [Scenario {lab_num}] Test suite prompt NOT FOUND in guide.md: {p}")
                     all_passed = False
                 
     if all_passed:

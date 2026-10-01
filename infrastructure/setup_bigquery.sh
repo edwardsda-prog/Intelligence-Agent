@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Setup Script: Lab 1 - Data Foundations & Multi-Domain Intelligence
+# Setup Script: Scenario 1 - Data Foundations & Multi-Domain Intelligence
 # ==============================================================================
 
 set -e
@@ -9,10 +9,10 @@ cd "$(dirname "$0")"
 PROJECT_ID=${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}
 PROJECT_ID=${PROJECT_ID:-"${PROJECT_ID}"}
 LOCATION=${LOCATION:-"us-central1"}
-BUCKET_NAME="gs://${PROJECT_ID}-learning-labs-humint-docs"
+BUCKET_NAME="gs://${PROJECT_ID}-humint-docs"
 
 echo "======================================================================"
-echo "🚀 Provisioning Lab 1: BigQuery Multi-Domain Data & HUMINT Storage"
+echo "🚀 Provisioning Scenario 1: BigQuery Multi-Domain Data & HUMINT Storage"
 echo "Project ID:   $PROJECT_ID"
 echo "Region:       $LOCATION"
 echo "GCS Bucket:   $BUCKET_NAME"
@@ -20,17 +20,17 @@ echo "======================================================================"
 
 # 1. Provision BigQuery Dataset
 echo ""
-echo "📌 [1/2] Provisioning BigQuery Dataset (learning_labs_mission_data)..."
+echo "📌 [1/2] Provisioning BigQuery Dataset (mission_data)..."
 bq query --location=$LOCATION --use_legacy_sql=false --project_id="$PROJECT_ID" < ./setup_dataset.sql
 bq query --location=$LOCATION --use_legacy_sql=false --project_id="$PROJECT_ID" < ./setup_golden_dataset.sql
 
 # Polling for BigQuery dataset readiness
-echo "⏳ Polling BigQuery dataset learning_labs_mission_data for READY status..."
+echo "⏳ Polling BigQuery dataset mission_data for READY status..."
 MAX_RETRIES=15
 RETRY_COUNT=0
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if bq show --dataset "$PROJECT_ID:learning_labs_mission_data" >/dev/null 2>&1; then
-        echo "✅ BigQuery dataset 'learning_labs_mission_data' and tables confirmed READY."
+    if bq show --dataset "$PROJECT_ID:mission_data" >/dev/null 2>&1; then
+        echo "✅ BigQuery dataset 'mission_data' and tables confirmed READY."
         break
     fi
     RETRY_COUNT=$((RETRY_COUNT+1))
@@ -71,5 +71,5 @@ echo "📌 [3/3] Triggering Data Store Synchronization..."
 
 echo ""
 echo "======================================================================"
-echo "🎉 Lab 1 Setup Complete!"
+echo "🎉 Scenario 1 Setup Complete!"
 echo "======================================================================"

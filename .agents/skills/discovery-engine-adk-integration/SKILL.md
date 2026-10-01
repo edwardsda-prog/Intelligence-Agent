@@ -56,7 +56,7 @@ curl -X PATCH \
 Discovery Engine unstructured imports require NDJSON / JSONL metadata format:
 
 ```json
-{"id": "hum-445", "jsonData": "{\"title\": \"HUMINT Intelligence Report HUM-445\", \"file\": \"HUM-445_TGT-ALPHA-7.pdf\"}", "content": {"mimeType": "application/pdf", "uri": "gs://{PROJECT_ID}-learning-labs-humint-docs/HUM-445_TGT-ALPHA-7.pdf"}}
+{"id": "hum-445", "jsonData": "{\"title\": \"HUMINT Intelligence Report HUM-445\", \"file\": \"HUM-445_TGT-ALPHA-7.pdf\"}", "content": {"mimeType": "application/pdf", "uri": "gs://{PROJECT_ID}-humint-docs/HUM-445_TGT-ALPHA-7.pdf"}}
 ```
 
 Trigger incremental import:
@@ -68,7 +68,7 @@ curl -X POST \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents:import" \
   -d '{
       "gcsSource": {
-          "inputUris": ["gs://'"${PROJECT_ID}"'-learning-labs-humint-docs/documents.jsonl"]
+          "inputUris": ["gs://'"${PROJECT_ID}"'-humint-docs/documents.jsonl"]
       },
       "reconciliationMode": "INCREMENTAL"
   }'
@@ -86,7 +86,7 @@ To prevent this, you **MUST** automate the stale agent purge and the new `adkAge
 ```bash
 # Sync active agent with Discovery Engine Agent Registry (prevent NOT_FOUND errors)
 TOKEN=$(gcloud auth print-access-token)
-ENGINE_ID="learning-labs-mission-app"
+ENGINE_ID="mission-intel-app"
 
 echo "Purging stale Agent Registrations in Discovery Engine..."
 for AGENT_ID_STALE in $(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}/assistants/default_assistant/agents" | grep -o '"name": "[^"]*"' | grep -o 'agents/[^"]*' | cut -d/ -f2); do
@@ -100,7 +100,7 @@ curl -s -X POST -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: applicatio
     "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}/assistants/default_assistant/agents?agentId=mission-intel-agent-live" \
     -d '{
         "displayName": "Mission Intel Agent",
-        "description": "Learning Lab Hybrid Mission Intelligence Agent",
+        "description": "Mission Intel Hybrid Mission Intelligence Agent",
         "adkAgentDefinition": {
             "provisionedReasoningEngine": {
                 "reasoningEngine": "'"${RE_ID}"'"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# End-to-End Automated Workshop Test Suite: Learning Lab Multi-Domain AI Platform
+# End-to-End Automated Workshop Test Suite: Mission Intel Multi-Domain AI Platform
 # ==============================================================================
 #
 # Supported Execution Modes:
@@ -50,7 +50,7 @@ if [[ "$MODE" == "mock" ]]; then
     echo "======================================================================"
     echo "⚡ Fast Hermetic / Mock Mode requested"
     echo "======================================================================"
-    python3 tests/test_all_labs_prompts.py --mock
+    python3 tests/test_prompts.py --mock
     exit $?
 fi
 
@@ -101,7 +101,7 @@ echo "=== STEP 0: Provisioning Unified Environment, Gemini Enterprise & IAM Secu
 echo ""
 echo "=== STEP 1: Testing BigQuery Setup ==="
 bq query --location=us-central1 --use_legacy_sql=false --project_id="$PROJECT_ID" < infrastructure/schemas/setup_dataset.sql > /dev/null 2>&1
-ROW_COUNT=$(bq query --location=us-central1 --use_legacy_sql=false --format=csv "SELECT COUNT(*) FROM \`${PROJECT_ID}.learning_labs_mission_data.radar_telemetry\`" | tail -n 1)
+ROW_COUNT=$(bq query --location=us-central1 --use_legacy_sql=false --format=csv "SELECT COUNT(*) FROM \`${PROJECT_ID}.mission_data.radar_telemetry\`" | tail -n 1)
 echo "✅ BigQuery dataset created. radar_telemetry row count: $ROW_COUNT (Expected: 8)"
 
 # ------------------------------------------------------------------------------
@@ -126,14 +126,14 @@ CLOUD_RUN_URL=$(gcloud run services describe bigquery-mcp-server --region "$LOCA
 echo "✅ Cloud Run MCP Server URL: $CLOUD_RUN_URL"
 
 # ------------------------------------------------------------------------------
-# STEP 3: Setup Datastore for Lab 5 / 8
+# STEP 3: Setup Datastore for Scenario 5 / 8
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 3: Setup Unstructured Datastore (HUMINT PDFs) ==="
 ./infrastructure/setup_discovery_engine.sh
 
 # ------------------------------------------------------------------------------
-# STEP 4: Setup RAG (Lab 8)
+# STEP 4: Setup RAG (Scenario 8)
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 4: Setup RAG ==="
@@ -144,7 +144,7 @@ if [ -f lab8/code/provision_rag.py ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# STEP 5: Setup Model Armor (Lab 4)
+# STEP 5: Setup Model Armor (Scenario 4)
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 5: Setup Model Armor ==="
@@ -170,7 +170,7 @@ export AGENT_ENGINE_ID=$(echo "$RE_NAME" | awk -F'/' '{print $NF}')
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== COMPREHENSIVE END-TO-END VALIDATION: Testing All Prompts in Live Mode ==="
-python3 tests/test_all_labs_prompts.py --live --project="$PROJECT_ID" --location="$LOCATION"
+python3 tests/test_prompts.py --live --project="$PROJECT_ID" --location="$LOCATION"
 
 echo ""
 echo "======================================================================"

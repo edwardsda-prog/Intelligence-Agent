@@ -43,12 +43,12 @@ fi
 # ------------------------------------------------------------------------------
 echo ""
 echo "📌 [1/9] Cleaning up BigQuery Datasets..."
-if bq ls --project_id="${PROJECT_ID}" 2>/dev/null | grep -q "learning_labs_mission_data"; then
-  echo "   Deleting dataset: ${PROJECT_ID}:learning_labs_mission_data..."
-  bq rm -r -f -d "${PROJECT_ID}:learning_labs_mission_data" 2>/dev/null || true
+if bq ls --project_id="${PROJECT_ID}" 2>/dev/null | grep -q "mission_data"; then
+  echo "   Deleting dataset: ${PROJECT_ID}:mission_data..."
+  bq rm -r -f -d "${PROJECT_ID}:mission_data" 2>/dev/null || true
   echo "   ✅ BigQuery dataset deleted."
 else
-  echo "   ℹ️ Dataset learning_labs_mission_data not found."
+  echo "   ℹ️ Dataset mission_data not found."
 fi
 
 # ------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ fi
 # ------------------------------------------------------------------------------
 echo ""
 echo "📌 [2/9] Cleaning up Cloud Run Services..."
-WORKSHOP_RUN_SERVICES=("bigquery-mcp-server" "remote-mcp-server" "learning-lab-gateway")
+WORKSHOP_RUN_SERVICES=("bigquery-mcp-server" "remote-mcp-server" "mission-intel-gateway")
 for SVC in "${WORKSHOP_RUN_SERVICES[@]}"; do
   if gcloud run services describe "${SVC}" --region="${LOCATION}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
     echo "   Deleting Cloud Run service: ${SVC} (${LOCATION})..."
@@ -72,10 +72,10 @@ done
 # ------------------------------------------------------------------------------
 echo ""
 echo "📌 [3/9] Cleaning up Agent Gateway & Agent Registry..."
-echo "   Checking Agent Gateway: learning-lab-gateway..."
-gcloud network-services agent-gateways delete learning-lab-gateway --location="${LOCATION}" --project="${PROJECT_ID}" --quiet >/dev/null 2>&1 || true
+echo "   Checking Agent Gateway: mission-intel-gateway..."
+gcloud network-services agent-gateways delete mission-intel-gateway --location="${LOCATION}" --project="${PROJECT_ID}" --quiet >/dev/null 2>&1 || true
 
-AR_SERVICES=("bigquery-mcp" "learning-lab-a2a-host")
+AR_SERVICES=("bigquery-mcp" "mission-intel-a2a-host")
 for AR_SVC in "${AR_SERVICES[@]}"; do
   echo "   Checking Agent Registry service: ${AR_SVC}..."
   gcloud alpha agent-registry services delete "${AR_SVC}" --location="${LOCATION}" --project="${PROJECT_ID}" --quiet >/dev/null 2>&1 || true
@@ -137,7 +137,7 @@ fi
 # ------------------------------------------------------------------------------
 echo ""
 echo "📌 [5/9] Cleaning up Cloud Storage Buckets..."
-WORKSHOP_BUCKETS=("gs://${PROJECT_ID}-learning-labs-humint-docs" "gs://${PROJECT_ID}-mission-docs")
+WORKSHOP_BUCKETS=("gs://${PROJECT_ID}-humint-docs" "gs://${PROJECT_ID}-mission-docs")
 for BKT in "${WORKSHOP_BUCKETS[@]}"; do
   if gcloud storage ls "${BKT}" >/dev/null 2>&1; then
     echo "   Deleting bucket: ${BKT}..."
@@ -268,12 +268,12 @@ check_status() {
 }
 
 # 1. BigQuery Dataset
-bq show "${PROJECT_ID}:learning_labs_mission_data" >/dev/null 2>&1 && BQ_STATUS=1 || BQ_STATUS=0
-check_status "BigQuery: learning_labs_mission_data" "$BQ_STATUS"
+bq show "${PROJECT_ID}:mission_data" >/dev/null 2>&1 && BQ_STATUS=1 || BQ_STATUS=0
+check_status "BigQuery: mission_data" "$BQ_STATUS"
 
 # 2. Cloud Storage Bucket
-gcloud storage ls "gs://${PROJECT_ID}-learning-labs-humint-docs" >/dev/null 2>&1 && GCS_STATUS=1 || GCS_STATUS=0
-check_status "Cloud Storage: learning-labs-humint-docs" "$GCS_STATUS"
+gcloud storage ls "gs://${PROJECT_ID}-humint-docs" >/dev/null 2>&1 && GCS_STATUS=1 || GCS_STATUS=0
+check_status "Cloud Storage: humint-docs" "$GCS_STATUS"
 
 # 3. Cloud Run Service
 gcloud run services describe bigquery-mcp-server --region="${LOCATION}" --project="${PROJECT_ID}" >/dev/null 2>&1 && CR_STATUS=1 || CR_STATUS=0

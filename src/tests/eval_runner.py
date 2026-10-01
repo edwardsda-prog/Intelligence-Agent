@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Lab 6: Offline Evaluation Runner Wrapper
+Scenario 6: Offline Evaluation Runner Wrapper
 Invokes run_offline_evaluation.py preserving all command-line arguments.
 """
 import os

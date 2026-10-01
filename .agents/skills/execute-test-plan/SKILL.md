@@ -1,18 +1,18 @@
 ---
 name: execute-test-plan
-description: Execute the E2E Live Test Plan for the Learning Labs project to verify the multi-domain intelligence agentic ecosystem against both local SQLite and live Google Cloud infrastructure.
+description: Execute the E2E Live Test Plan for the Mission Intel project to verify the multi-domain intelligence agentic ecosystem against both local SQLite and live Google Cloud infrastructure.
 ---
 
-# Execute Learning Labs Test Plan
+# Execute Mission Intel Test Plan
 
-This skill automates the process of executing the Live E2E Test Plan for the Learning Labs project.
+This skill automates the process of executing the Live E2E Test Plan for the Mission Intel project.
 
 ## Workflow Steps
 
 1. **Verify Setup**: Ensure you are authenticated with Google Cloud (`gcloud auth login --update-adc` and `gcloud config set project <PROJECT_ID>`) and have the correct Python dependencies.
 2. **Phase 0: Teardown & Clean-Slate Audit**: Run `bash lab0/code/teardown.sh` and verify all 7 resource categories return `CLEAN ✅ (Decommissioned)`. Purge local SQLite state (`rm -f lab2/mission_data.db`).
 3. **Phase 1: Fail-Fast Unit & Schema Parity Gate**: Run `python3 -m unittest discover -s tests -p "test_*.py" -v` including `test_schema_parity.py` and `test_dashboards.py`.
-4. **Phase 2: System Setup & Resource Naming Validation**: Run `bash lab0/code/setup.sh`. Ensure standard resource names are used (`learning_labs_mission_data`, `gs://${PROJECT_ID}-learning-labs-humint-docs`, `learning-labs-mission-app`).
+4. **Phase 2: System Setup & Resource Naming Validation**: Run `bash lab0/code/setup.sh`. Ensure standard resource names are used (`mission_data`, `gs://${PROJECT_ID}-humint-docs`, `mission-intel-app`).
 5. **Phase 3: Telemetry Seeding**: Execute telemetry seeding scripts:
    - `bash lab3/code/setup_telemetry.sh`
    - `bash lab4/code/seed_security_telemetry.sh`

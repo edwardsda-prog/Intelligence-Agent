@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Learning Lab Multi-Domain AI Workshop - Unified Environment Setup
+# Mission Intel Multi-Domain AI Workshop - Unified Environment Setup
 # ==============================================================================
 # Strategic Context & Invariants:
 #   - Secure Intranet App Provisioning with Enterprise LLM Add-ons
@@ -41,7 +41,7 @@ if [ -d "/home/aguser/Documents/Research/bin" ]; then
 fi
 
 echo -e "${BLUE}==============================================================================${RESET}"
-echo -e "${BOLD}🚀 Learning Lab Multi-Domain AI Workshop - Unified Setup${RESET}"
+echo -e "${BOLD}🚀 Mission Intel Multi-Domain AI Workshop - Unified Setup${RESET}"
 echo -e "${DIM}   Automated Cloud Foundation, Gemini Enterprise Intranet & Agent Environment${RESET}"
 echo -e "${BLUE}==============================================================================${RESET}"
 
@@ -166,11 +166,11 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 5. Gemini Enterprise Engine Provisioning (learning-labs-mission-app)
+# 5. Gemini Enterprise Engine Provisioning (mission-intel-app)
 # ------------------------------------------------------------------------------
 echo ""
 echo -e "${CYAN}📌 [5/6] Provisioning Gemini Enterprise Intranet Application...${RESET}"
-ENGINE_ID="learning-labs-mission-app"
+ENGINE_ID="mission-intel-app"
 
 if [ -n "$TOKEN" ]; then
     # Idempotency check: check if Engine resource already exists
@@ -189,11 +189,11 @@ if [ -n "$TOKEN" ]; then
             -H "X-Goog-User-Project: ${PROJECT_ID}" \
             "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines?engineId=${ENGINE_ID}" \
             -d '{
-                "displayName": "Learning Lab Mission Intelligence Enterprise App",
+                "displayName": "Mission Intelligence Enterprise App",
                 "solutionType": "SOLUTION_TYPE_SEARCH",
                 "industryVertical": "GENERIC",
                 "commonConfig": {
-                    "companyName": "Learning Lab"
+                    "companyName": "Mission Intel"
                 },
                 "searchEngineConfig": {
                     "searchTier": "SEARCH_TIER_ENTERPRISE",
@@ -243,7 +243,7 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 6. Local SQLite Database Initialization (Lab 2) & Python SDK Verification
+# 6. Local SQLite Database Initialization (Scenario 2) & Python SDK Verification
 # ------------------------------------------------------------------------------
 echo ""
 echo -e "${CYAN}📌 [6/6] Initializing Local SQLite Mission Intelligence Database & Python SDKs...${RESET}"
@@ -257,7 +257,7 @@ else
     echo -e "   ${GREEN}✓${RESET} Python SDK packages updated."
 fi
 
-# Pre-populate local SQLite database for Lab 2
+# Pre-populate local SQLite database for Scenario 2
 if [ -f "# deprecated" ]; then
     python3 # deprecated >/dev/null 2>&1
     echo -e "   ${GREEN}✓${RESET} Pre-populated local database: ${BOLD}# deprecated${RESET}"
@@ -277,7 +277,7 @@ echo -e "${BOLD}📋 Configuration Summary:${RESET}"
 echo -e "  • ${BOLD}Project ID:${RESET}         ${GREEN}${PROJECT_ID}${RESET}"
 echo -e "  • ${BOLD}Region:${RESET}             ${GREEN}${LOCATION}${RESET}"
 echo -e "  • ${BOLD}Project Number:${RESET}     ${GREEN}${PROJECT_NUMBER:-"(Unresolved / Not Set)"}${RESET}"
-echo -e "  • ${BOLD}Gemini Intranet:${RESET}    ${GREEN}learning-labs-mission-app${RESET} (LLM Add-on Enabled)"
+echo -e "  • ${BOLD}Gemini Intranet:${RESET}    ${GREEN}mission-intel-app${RESET} (LLM Add-on Enabled)"
 echo -e "  • ${BOLD}Web Grounding:${RESET}      ${GREEN}Disabled${RESET} (Secure Mission Intelligence)"
 echo -e "  • ${BOLD}Cloud Identity:${RESET}     ${GREEN}GSUITE${RESET} (Linked)"
 echo -e "  • ${BOLD}Local Database:${RESET}     ${GREEN}# deprecated${RESET} (Initialized)"
@@ -293,21 +293,21 @@ echo -e "   and will operate without requiring immediate license assignment."
 echo -e "   ${DIM}(Refer to licensing placeholder guidance in ../../lab3/guide.md & ../../lab5/guide.md)${RESET}"
 echo ""
 echo -e "${BLUE}==============================================================================${RESET}"
-echo -e "${BOLD}🚀 PROCEED TO LAB 1: Data Foundations & BigQuery Ingestion${RESET}"
+echo -e "${BOLD}🚀 PROCEED TO SCENARIO 1: Data Foundations & BigQuery Ingestion${RESET}"
 echo -e "${BLUE}==============================================================================${RESET}"
 echo ""
-echo -e "  ${BOLD}Step 1:${RESET} Navigate to the Lab 1 workspace:"
+echo -e "  ${BOLD}Step 1:${RESET} Navigate to the Scenario 1 workspace:"
 echo -e "          ${CYAN}cd ../infrastructure/schemas${RESET}"
 echo ""
-echo -e "  ${BOLD}Step 2:${RESET} Run the automated Lab 1 setup script to provision BigQuery datasets"
+echo -e "  ${BOLD}Step 2:${RESET} Run the automated Scenario 1 setup script to provision BigQuery datasets"
 echo -e "          and generate multimodal HUMINT intelligence reports:"
 echo -e "          ${CYAN}./setup_lab1.sh${RESET}"
 echo ""
 echo -e "  ${BOLD}Step 3:${RESET} Open BigQuery Studio to inspect the multi-domain intelligence schema:"
 echo -e "          ${CYAN}https://console.cloud.google.com/bigquery?project=${PROJECT_ID}${RESET}"
-echo -e "          ${DIM}(Verify dataset '${PROJECT_ID}.learning_labs_mission_data' and view 'v_multi_domain_intelligence')${RESET}"
+echo -e "          ${DIM}(Verify dataset '${PROJECT_ID}.mission_data' and view 'v_multi_domain_intelligence')${RESET}"
 echo ""
-echo -e "  ${BOLD}Step 4:${RESET} Open the step-by-step Lab 1 mission guide:"
+echo -e "  ${BOLD}Step 4:${RESET} Open the step-by-step Scenario 1 mission guide:"
 echo -e "          ${CYAN}cat guide.md${RESET}  ${DIM}or view in your IDE${RESET}"
 echo ""
 echo -e "${BLUE}==============================================================================${RESET}"

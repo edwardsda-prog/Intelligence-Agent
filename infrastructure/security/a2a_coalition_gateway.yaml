@@ -7,6 +7,6 @@ network: projects/antig-dave/global/networks/military-ocr-vpc
 subnetwork: projects/antig-dave/regions/us-central1/subnetworks/military-ocr-vpc
 labels:
   environment: production
-  lab: lab7
+  scenario: lab7
   classification: nato-releasable
 description: "Gemini Enterprise Agent Platform - Managed Agent Gateway for NATO Maritime Command A2A Federation"

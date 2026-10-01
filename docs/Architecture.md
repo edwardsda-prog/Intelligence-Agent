@@ -1,13 +1,13 @@
 # Architecture
 
 ## Executive Summary & Ecosystem
-The Learning Lab Mission Intelligence Agentic Platform is a demonstrator application deployed on Google Cloud Platform (GCP). It integrates the Google Agent Developer Kit (ADK 2.0), Model Context Protocol (MCP), and Vertex AI to deliver a multi-domain intelligence analysis capability. Designed for Joint Command Staff, the platform operates across 3-tier memory structures and leverages high-performance Reasoning Engines (Gemini 3.8 Flash / Gemini 3.1 Pro) for secure, deterministic workflows.
+The Mission Intelligence Agentic Platform is a demonstrator application deployed on Google Cloud Platform (GCP). It integrates the Google Agent Developer Kit (ADK 2.0), Model Context Protocol (MCP), and Vertex AI to deliver a multi-domain intelligence analysis capability. Designed for Joint Command Staff, the platform operates across 3-tier memory structures and leverages high-performance Reasoning Engines (Gemini 3.8 Flash / Gemini 3.1 Pro) for secure, deterministic workflows.
 
 ## Infrastructure Topology
 ```mermaid
 flowchart TD
     subgraph DataLayer["1. Secure Data Foundations"]
-        BQ[("BigQuery<br/>learning_labs_mission_data<br/>6 Core Tables + Joined View")]
+        BQ[("BigQuery<br/>mission_data<br/>6 Core Tables + Joined View")]
         GCS[("Cloud Storage Bucket<br/>Operational HUMINT PDFs")]
         DE["Discovery Engine / Vertex AI Search<br/>Unstructured Datastore<br/>Extractive Segments Enabled"]
         GCS -->|Automated OCR & Ingestion| DE

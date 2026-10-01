@@ -1,5 +1,5 @@
--- Learning Lab Mission Intelligence Multi-Domain Dataset Setup
--- Dataset: learning_labs_mission_data
+-- Mission Intel Mission Intelligence Multi-Domain Dataset Setup
+-- Dataset: mission_data
 -- Target Project: {PROJECT_ID} (or your active GCP Project ID)
 -- Description: Comprehensive multi-domain defense mission intelligence dataset spanning:
 --   1. Radar Telemetry (air, surface, littoral, and subsurface tracks)
@@ -10,13 +10,13 @@
 --   6. Friendly Blue Force Assets (callsigns, readiness, defensive perimeters, assigned sectors)
 
 -- Ensure the dataset exists:
-CREATE SCHEMA IF NOT EXISTS `learning_labs_mission_data`
+CREATE SCHEMA IF NOT EXISTS `mission_data`
 OPTIONS (location = 'us-central1');
 
 --------------------------------------------------------------------------------
 -- 1. RADAR TELEMETRY
 --------------------------------------------------------------------------------
-CREATE OR REPLACE TABLE `learning_labs_mission_data.radar_telemetry` (
+CREATE OR REPLACE TABLE `mission_data.radar_telemetry` (
   track_id STRING,
   timestamp TIMESTAMP,
   latitude FLOAT64,
@@ -31,7 +31,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.radar_telemetry` (
   mgrs_coord STRING
 );
 
-INSERT INTO `learning_labs_mission_data.radar_telemetry` 
+INSERT INTO `mission_data.radar_telemetry` 
 (track_id, timestamp, latitude, longitude, altitude_ft, velocity_knots, bearing_degrees, heading_degrees, platform_type, signature, target_id, mgrs_coord)
 VALUES
 ('TRK-901', CURRENT_TIMESTAMP(), 51.5074, -0.1278, 0, 45, 145.2, 142.0, 'Surface Vessel / Fast Attack Craft', 'Project 22800 Karakurt-Class Guided Missile Corvette', 'TGT-ALPHA-7', '30UGC9914906064'),
@@ -46,7 +46,7 @@ VALUES
 --------------------------------------------------------------------------------
 -- 2. ELECTRONIC WARFARE (EW) INTERCEPTS & BEARINGS
 --------------------------------------------------------------------------------
-CREATE OR REPLACE TABLE `learning_labs_mission_data.ew_intercepts` (
+CREATE OR REPLACE TABLE `mission_data.ew_intercepts` (
   ew_id STRING,
   timestamp TIMESTAMP,
   sensor_location STRING,
@@ -63,7 +63,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.ew_intercepts` (
   target_id STRING
 );
 
-INSERT INTO `learning_labs_mission_data.ew_intercepts`
+INSERT INTO `mission_data.ew_intercepts`
 (ew_id, timestamp, sensor_location, bearing_degrees, ew_bearing, signal_frequency_ghz, prf_khz, emitter_type, threat_level, signal_strength_dbm, estimated_track_id, track_id, radar_track_id, target_id)
 VALUES
 ('EW-INT-101', CURRENT_TIMESTAMP(), 'Site-A', 145.2, 145.2, 9.41, 1.65, 'Mineral-ME Naval Target Acquisition & Fire Control', 'CRITICAL', -68.4, 'TRK-901', 'TRK-901', 'TRK-901', 'TGT-ALPHA-7'),
@@ -77,7 +77,7 @@ VALUES
 ('EW-INT-108', TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE), 'Site-E', 120.0, 120.0, 4.85, 1.95, 'Krasukha-4 Tactical Broadband Jamming System', 'HIGH', -52.0, 'TRK-908', 'TRK-908', 'TRK-908', 'TGT-HOTEL-5');
 
 -- Dedicated ew_bearings table for backwards compatibility
-CREATE OR REPLACE TABLE `learning_labs_mission_data.ew_bearings` (
+CREATE OR REPLACE TABLE `mission_data.ew_bearings` (
   ew_id STRING,
   timestamp TIMESTAMP,
   sensor_location STRING,
@@ -94,7 +94,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.ew_bearings` (
   target_id STRING
 );
 
-INSERT INTO `learning_labs_mission_data.ew_bearings`
+INSERT INTO `mission_data.ew_bearings`
 (ew_id, timestamp, sensor_location, bearing_degrees, ew_bearing, signal_frequency_ghz, prf_khz, emitter_type, threat_level, signal_strength_dbm, estimated_track_id, track_id, radar_track_id, target_id)
 VALUES
 ('EW-001', CURRENT_TIMESTAMP(), 'Site-A', 145.2, 145.2, 9.41, 1.65, 'Mineral-ME Naval Target Acquisition & Fire Control', 'CRITICAL', -68.4, 'TRK-901', 'TRK-901', 'TRK-901', 'TGT-ALPHA-7'),
@@ -110,7 +110,7 @@ VALUES
 --------------------------------------------------------------------------------
 -- 3. SATELLITE RECONNAISSANCE & IMAGERY INTEL
 --------------------------------------------------------------------------------
-CREATE OR REPLACE TABLE `learning_labs_mission_data.satellite_recon` (
+CREATE OR REPLACE TABLE `mission_data.satellite_recon` (
   image_id STRING,
   timestamp TIMESTAMP,
   target_id STRING,
@@ -124,7 +124,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.satellite_recon` (
   image_resolution_meters FLOAT64
 );
 
-INSERT INTO `learning_labs_mission_data.satellite_recon`
+INSERT INTO `mission_data.satellite_recon`
 (image_id, timestamp, target_id, mgrs_coord, latitude, longitude, sensor_type, cloud_cover_percentage, detected_structures_units, confidence_score, image_resolution_meters)
 VALUES
 ('SAT-SAR-112', TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR), 'TGT-ALPHA-7', '30UGC9914906064', 51.5074, -0.1278, 'SAR', 0.0, 'Fast Attack Craft equipped with 8-cell VLS and AK-176MA naval gun', 0.94, 0.30),
@@ -137,7 +137,7 @@ VALUES
 ('SAT-SAR-120', TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 70 MINUTE), 'TGT-HOTEL-5', '30UGC9914906090', 51.5600, -0.0700, 'SAR', 0.0, 'Yantar-class intelligence collection ship with high-power satellite antennas and sub-sea deployment cranes active', 0.92, 0.30);
 
 -- Dedicated satellite_imagery_intel table for backwards compatibility
-CREATE OR REPLACE TABLE `learning_labs_mission_data.satellite_imagery_intel` (
+CREATE OR REPLACE TABLE `mission_data.satellite_imagery_intel` (
   image_id STRING,
   timestamp TIMESTAMP,
   target_id STRING,
@@ -150,7 +150,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.satellite_imagery_intel` (
   detected_object STRING
 );
 
-INSERT INTO `learning_labs_mission_data.satellite_imagery_intel`
+INSERT INTO `mission_data.satellite_imagery_intel`
 (image_id, timestamp, target_id, mgrs_coord, latitude, longitude, sensor_type, cloud_cover_percentage, confidence_score, detected_object)
 VALUES
 ('SAT-SAR-112', TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR), 'TGT-ALPHA-7', '30UGC9914906064', 51.5074, -0.1278, 'SAR', 0.0, 0.94, 'Fast Attack Craft equipped with 8-cell VLS and AK-176MA naval gun'),
@@ -165,7 +165,7 @@ VALUES
 --------------------------------------------------------------------------------
 -- 4. CYBER THREAT INTELLIGENCE
 --------------------------------------------------------------------------------
-CREATE OR REPLACE TABLE `learning_labs_mission_data.cyber_threat_intel` (
+CREATE OR REPLACE TABLE `mission_data.cyber_threat_intel` (
   event_id STRING,
   timestamp TIMESTAMP,
   target_system STRING,
@@ -179,7 +179,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.cyber_threat_intel` (
   description STRING
 );
 
-INSERT INTO `learning_labs_mission_data.cyber_threat_intel`
+INSERT INTO `mission_data.cyber_threat_intel`
 (event_id, timestamp, target_system, threat_actor, indicator_of_compromise, compromised_c2_frequency_mhz, affected_tactical_network, threat_level, status, target_id, description)
 VALUES
 ('CYB-001', TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE), 'Site-A_Radar_Control', 'APT-BEAR', 'IP:198.51.100.84', 415.50, 'TACNET-NORTH-COASTAL', 'CRITICAL', 'Active Breach', 'TGT-ALPHA-7', 'Adversary injected spoofed azimuth packets into Site-A coastal radar processing core to mask TRK-901 approach.'),
@@ -194,7 +194,7 @@ VALUES
 --------------------------------------------------------------------------------
 -- 5. HUMAN INTELLIGENCE (HUMINT) REPORTS
 --------------------------------------------------------------------------------
-CREATE OR REPLACE TABLE `learning_labs_mission_data.humint_reports` (
+CREATE OR REPLACE TABLE `mission_data.humint_reports` (
   report_id STRING,
   timestamp TIMESTAMP,
   target_id STRING,
@@ -206,7 +206,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.humint_reports` (
   reported_by STRING
 );
 
-INSERT INTO `learning_labs_mission_data.humint_reports`
+INSERT INTO `mission_data.humint_reports`
 (report_id, timestamp, target_id, mgrs_coord, location_name, source_reliability, suspected_movement, content, reported_by)
 VALUES
 ('HUM-445', TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 3 HOUR), 'TGT-ALPHA-7', '30UGC9914906064', 'Blackwater Estuary Inlet', 'A - Completely Reliable', 'Unauthorized fast attack missile craft maneuvering toward shipping channel under maritime radar cover', 'Local maritime watcher confirms unauthorized fast attack vessel masked as commercial workboat operating out of coastal estuary depot without AIS transponder; observed loading dual containerized anti-ship missile cannisters at midnight.', 'Station Alpha Field Officer'),
@@ -221,7 +221,7 @@ VALUES
 --------------------------------------------------------------------------------
 -- 6. FRIENDLY BLUE FORCE ASSETS (BFT)
 --------------------------------------------------------------------------------
-CREATE OR REPLACE TABLE `learning_labs_mission_data.friendly_assets` (
+CREATE OR REPLACE TABLE `mission_data.friendly_assets` (
   asset_id STRING,
   unit_name STRING,
   asset_type STRING,
@@ -236,7 +236,7 @@ CREATE OR REPLACE TABLE `learning_labs_mission_data.friendly_assets` (
   last_beacon_time TIMESTAMP
 );
 
-INSERT INTO `learning_labs_mission_data.friendly_assets`
+INSERT INTO `mission_data.friendly_assets`
 (asset_id, unit_name, asset_type, callsign, current_status, defensive_perimeter, assigned_sector, mgrs_coord, latitude, longitude, operational_readiness, last_beacon_time)
 VALUES
 ('FA-DDG-01', 'HMS Defender (Type 45 Guided Missile Destroyer)', 'Aegis / Sea Viper Air Defense Destroyer', 'SENTINEL-1', 'MISSION READY / WEAPONS FREE', '60nm Sea Viper Aster-30 Air & Missile Defense Envelope', 'SECTOR-NORTH-COASTAL', '30UGC9900005000', 51.4850, -0.1100, '100% Fully Mission Capable', CURRENT_TIMESTAMP()),
@@ -251,7 +251,7 @@ VALUES
 --------------------------------------------------------------------------------
 -- 7. UNIFIED OPERATIONAL VIEW FOR ACCELERATED AGENTIC FUSION
 --------------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `learning_labs_mission_data.v_multi_domain_intelligence` AS
+CREATE OR REPLACE VIEW `mission_data.v_multi_domain_intelligence` AS
 SELECT 
   r.track_id,
   r.target_id,
@@ -281,14 +281,14 @@ SELECT
   f.unit_name as friendly_unit,
   f.callsign as friendly_callsign,
   f.defensive_perimeter as friendly_perimeter
-FROM `learning_labs_mission_data.radar_telemetry` r
-LEFT JOIN `learning_labs_mission_data.ew_intercepts` e 
+FROM `mission_data.radar_telemetry` r
+LEFT JOIN `mission_data.ew_intercepts` e 
   ON r.track_id = e.estimated_track_id OR r.target_id = e.target_id
-LEFT JOIN `learning_labs_mission_data.satellite_recon` s 
+LEFT JOIN `mission_data.satellite_recon` s 
   ON r.target_id = s.target_id
-LEFT JOIN `learning_labs_mission_data.cyber_threat_intel` c 
+LEFT JOIN `mission_data.cyber_threat_intel` c 
   ON r.target_id = c.target_id
-LEFT JOIN `learning_labs_mission_data.humint_reports` h 
+LEFT JOIN `mission_data.humint_reports` h 
   ON r.target_id = h.target_id
-LEFT JOIN `learning_labs_mission_data.friendly_assets` f 
+LEFT JOIN `mission_data.friendly_assets` f 
   ON r.mgrs_coord = f.mgrs_coord OR (r.track_id = 'TRK-901' AND f.assigned_sector = 'SECTOR-NORTH-COASTAL');

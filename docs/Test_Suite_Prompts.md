@@ -1,10 +1,10 @@
 # Test Suite Prompts & Queries
 
-This document contains all the interactive prompts and SQL queries utilized by the automated end-to-end evaluation suite (`src/tests/test_all_labs_prompts.py`). These prompts are designed to rigorously test the platform across all 7 operational scenarios and quality dimensions.
+This document contains all the interactive prompts and SQL queries utilized by the automated end-to-end evaluation suite (`src/tests/test_prompts.py`). These prompts are designed to rigorously test the platform across all 7 operational scenarios and quality dimensions.
 
-## Lab 1: BigQuery Studio Hands-On SQL Queries
+## Data Foundations & BigQuery Structured Queries
 
-These SQL queries validate the structural integrity of the underlying `learning_labs_mission_data` dataset.
+These SQL queries validate the structural integrity of the underlying `mission_data` dataset.
 
 *   **Radar & EW Sensor Fusion**
     ```sql
@@ -46,7 +46,7 @@ These SQL queries validate the structural integrity of the underlying `learning_
 
 ---
 
-## Lab 2: Developing with ADK 2.0 & Local Interface
+## Agent Orchestration & Reasoning
 
 These prompts test basic reasoning capabilities and the ReAct orchestration loop.
 
@@ -59,7 +59,7 @@ These prompts test basic reasoning capabilities and the ReAct orchestration loop
 
 ---
 
-## Lab 3: Secure Deployment, Tool Sandboxing (MCP) & Observability
+## Tool Sandboxing (MCP) & Observability
 
 These prompts trigger external MCP tool dependencies to validate networking and OpenTelemetry tracing.
 
@@ -70,7 +70,7 @@ These prompts trigger external MCP tool dependencies to validate networking and 
 
 ---
 
-## Lab 4: DevSecOps Guardrails & HITL Gateways
+## DevSecOps Guardrails & HITL Gateways
 
 These adversarial prompts attempt to circumvent the Model Armor and authorization safeguards.
 
@@ -83,7 +83,7 @@ These adversarial prompts attempt to circumvent the Model Armor and authorizatio
 
 ---
 
-## Lab 5: Unstructured Multimodal RAG, Citations & Context Caching
+## Unstructured Multimodal RAG, Citations & Context Caching
 
 These prompts evaluate the RAG implementation and Context Caching on unstructured HUMINT PDFs.
 
@@ -94,7 +94,7 @@ These prompts evaluate the RAG implementation and Context Caching on unstructure
 
 ---
 
-## Lab 6: Offline Evaluation & 7 Quality Dimensions
+## Offline Evaluation & Quality Dimensions
 
 These prompts are used against golden baseline datasets to calculate accuracy scores.
 
@@ -107,7 +107,7 @@ These prompts are used against golden baseline datasets to calculate accuracy sc
 
 ---
 
-## Lab 7: Agent-to-Agent (A2A) Protocol Federation
+## Agent-to-Agent (A2A) Protocol Federation
 
 These prompts exercise the Agent Gateway and verify that A2A queries correctly apply boundary security.
 

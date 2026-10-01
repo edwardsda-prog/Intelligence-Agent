@@ -16,7 +16,7 @@ class TestAgentGateway(unittest.TestCase):
         Verify that test_nato_agent_to_agent_gateway correctly wraps the payload
         and parses the response, enforcing Model Armor redaction.
         """
-        project_id = os.environ.get("PROJECT_ID", "learning-lab-project")
+        project_id = os.environ.get("PROJECT_ID", "mission-intel-project")
         location = os.environ.get("LOCATION", "us-central1")
         service_name = "mission-intel-agent"
         prompt = "Provide raw coordinates for TRK-901."

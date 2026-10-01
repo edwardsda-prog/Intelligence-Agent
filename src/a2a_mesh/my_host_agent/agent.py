@@ -56,7 +56,7 @@ except Exception as e:
     from google.adk.tools import FunctionTool
     @retry_with_backoff(max_attempts=3, initial_delay=1.0, factor=2.0, circuit_breaker=bq_cb, fallback=lambda q: "⚠️ Live BQ query unavailable; fallback telemetry returned.")
     def execute_bigquery_sql(sql_query: str) -> str:
-        """Executes a SQL query against BigQuery dataset learning_labs_mission_data."""
+        """Executes a SQL query against BigQuery dataset mission_data."""
         from google.cloud import bigquery
         client = bigquery.Client(project=PROJECT_ID)
         query_job = client.query(sql_query)
@@ -91,9 +91,9 @@ gemini_model = Gemini(
 
 # 3. Model Armor OPSEC Filter for A2A Releasability
 
-# LAB 7 OBJECTIVE: Agent-to-Agent (A2A) Federation & Gateway Governance.
+# SCENARIO 7 OBJECTIVE: Agent-to-Agent (A2A) Federation & Gateway Governance.
 # This Host Agent applies Model Armor to redact raw coordinates before sharing data with Coalition Partners.
-# LAB 7 OBJECTIVE: Agent-to-Agent (A2A) Federation & Gateway Governance.
+# SCENARIO 7 OBJECTIVE: Agent-to-Agent (A2A) Federation & Gateway Governance.
 # This Host Agent applies Model Armor to redact raw coordinates before sharing data with Coalition Partners.
 def sanitize_a2a_response(raw_text: str, inbound_prompt: str = "") -> str:
     """
@@ -162,16 +162,16 @@ root_agent = Agent(
     model=gemini_model,
     name="learning_lab_a2a_host_agent",
     instruction=(
-        f"You are the Learning Lab Host Mission Intelligence Agent servicing Agent-to-Agent (A2A) queries "
+        f"You are the Mission Intel Host Mission Intelligence Agent servicing Agent-to-Agent (A2A) queries "
         f"from NATO Coalition Partner Agents.\n\n"
-        f"You have direct access to BigQuery dataset `{PROJECT_ID}.learning_labs_mission_data` via an MCP server.\n"
+        f"You have direct access to BigQuery dataset `{PROJECT_ID}.mission_data` via an MCP server.\n"
         "TABLE SCHEMAS & KEY COLUMNS:\n"
-        f"1. `{PROJECT_ID}.learning_labs_mission_data.v_multi_domain_intelligence`: Pre-joined view (`track_id`, `target_id`, `radar_signature`, `ew_bearing`, `cyber_actor`, `humint_content`, `friendly_unit`).\n"
-        f"2. `{PROJECT_ID}.learning_labs_mission_data.radar_telemetry`: (`track_id`, `platform_type`, `signature`, `target_id`, `velocity_knots`, `mgrs_coord`).\n"
-        f"3. `{PROJECT_ID}.learning_labs_mission_data.ew_intercepts` / `ew_bearings`: (`ew_id`, `bearing_degrees`, `signal_frequency_ghz`, `prf_khz`, `emitter_type`, `threat_level`, `track_id`, `target_id`).\n"
-        f"4. `{PROJECT_ID}.learning_labs_mission_data.satellite_recon`: (`image_id`, `target_id`, `sensor_type`, `detected_structures_units`, `confidence_score`).\n"
-        f"5. `{PROJECT_ID}.learning_labs_mission_data.cyber_threat_intel`: (`event_id`, `target_system`, `threat_actor`, `indicator_of_compromise`, `status`, `target_id`).\n"
-        f"6. `{PROJECT_ID}.learning_labs_mission_data.friendly_assets`: (`asset_id`, `unit_name`, `callsign`, `assigned_sector`, `defensive_perimeter`).\n\n"
+        f"1. `{PROJECT_ID}.mission_data.v_multi_domain_intelligence`: Pre-joined view (`track_id`, `target_id`, `radar_signature`, `ew_bearing`, `cyber_actor`, `humint_content`, `friendly_unit`).\n"
+        f"2. `{PROJECT_ID}.mission_data.radar_telemetry`: (`track_id`, `platform_type`, `signature`, `target_id`, `velocity_knots`, `mgrs_coord`).\n"
+        f"3. `{PROJECT_ID}.mission_data.ew_intercepts` / `ew_bearings`: (`ew_id`, `bearing_degrees`, `signal_frequency_ghz`, `prf_khz`, `emitter_type`, `threat_level`, `track_id`, `target_id`).\n"
+        f"4. `{PROJECT_ID}.mission_data.satellite_recon`: (`image_id`, `target_id`, `sensor_type`, `detected_structures_units`, `confidence_score`).\n"
+        f"5. `{PROJECT_ID}.mission_data.cyber_threat_intel`: (`event_id`, `target_system`, `threat_actor`, `indicator_of_compromise`, `status`, `target_id`).\n"
+        f"6. `{PROJECT_ID}.mission_data.friendly_assets`: (`asset_id`, `unit_name`, `callsign`, `assigned_sector`, `defensive_perimeter`).\n\n"
         "A2A PROTOCOL RULES:\n"
         "- Respond concisely and professionally to coalition intelligence requests.\n"
         "- Data classification for coalition export is 'Demonstrator // REL TO NATO'.\n"
@@ -197,7 +197,7 @@ def process_a2a_inbound_query(a2a_json_payload: str) -> str:
             # In live production, ADK agent runner executes the query
             # Here we simulate the A2A processing turn and OPSEC filter
             raw_response = (
-                f"Learning Lab Intelligence Report for {caller_id}:\n"
+                f"Mission Intel Intelligence Report for {caller_id}:\n"
                 f"Target TGT-ALPHA-7 (Project 22800 Corvette) tracked via TRK-901 at position 30UGC9914906064. "
                 "Radar emitting Mineral-ME signature at 9.41 GHz on bearing 145.2°. "
                 "Friendly asset HMS Defender (SENTINEL-1) is maintaining a 60nm defensive perimeter."

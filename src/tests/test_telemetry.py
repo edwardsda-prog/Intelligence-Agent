@@ -1,7 +1,7 @@
 """
 Unit Tests for Vertex AI Reasoning Engine Telemetry Collection & Message Content Logging
 ========================================================================================
-Validates that all agent packages (Labs 3, 5, 7) are configured so that BOTH checkboxes
+Validates that all agent packages (Scenarios 3, 5, 7) are configured so that BOTH checkboxes
 under Vertex AI Reasoning Engine 'Telemetry Collection' are enabled:
   1. 'Enable instrumentation of OpenTelemetry traces, logs and metrics'
   2. 'Enable logging of prompt inputs and response outputs'
@@ -15,10 +15,7 @@ from dotenv import dotenv_values
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AGENT_DIRS = [
-    os.path.join(REPO_ROOT, "lab3", "code", "my_agent"),
-    os.path.join(REPO_ROOT, "lab5", "code", "my_agent"),
-    os.path.join(REPO_ROOT, "lab7", "code", "my_host_agent"),
-    os.path.join(REPO_ROOT, "lab7", "code", "my_partner_agent"),
+    os.path.join(REPO_ROOT, "agent"),
 ]
 
 REQUIRED_ENV_KEYS = {
@@ -131,14 +128,14 @@ class TestTelemetryConfiguration(unittest.TestCase):
 
         sample_logs = [
             {
-                "trace": "projects/learning-lab-project/traces/4bf92f3577b34da6a3ce929d0e0e4736",
+                "trace": "projects/mission-intel-project/traces/4bf92f3577b34da6a3ce929d0e0e4736",
                 "spanId": "00f067aa0ba902b7",
                 "resource": {"type": "aiplatform.googleapis.com/ReasoningEngine"},
                 "jsonPayload": {
                     "attributes": {
                         "gen_ai.system": "google.adk",
                         "gen_ai.request.model": "gemini-3.8-flash",
-                        "gen_ai.prompt": "Find the EW bearings associated with radar track TRK-901 in learning_labs_mission_data.",
+                        "gen_ai.prompt": "Find the EW bearings associated with radar track TRK-901 in mission_data.",
                         "gen_ai.output.messages": "[{\"role\": \"assistant\", \"content\": \"Radar track TRK-901 correlates with EW bearing 042°...\"}]",
                         "gen_ai.usage.prompt_tokens": 1240,
                         "gen_ai.usage.completion_tokens": 320,
@@ -165,7 +162,7 @@ class TestTelemetryConfiguration(unittest.TestCase):
 
         custom_logs = [
             {
-                "trace": "projects/learning-lab-project/traces/4bf92f3577b34da6a3ce929d0e0e4737",
+                "trace": "projects/mission-intel-project/traces/4bf92f3577b34da6a3ce929d0e0e4737",
                 "spanId": "00f067aa0ba902b8",
                 "resource": {"type": "aiplatform.googleapis.com/ReasoningEngine"},
                 "jsonPayload": {
@@ -178,7 +175,7 @@ class TestTelemetryConfiguration(unittest.TestCase):
                 }
             },
             {
-                "trace": "projects/learning-lab-project/traces/4bf92f3577b34da6a3ce929d0e0e4737",
+                "trace": "projects/mission-intel-project/traces/4bf92f3577b34da6a3ce929d0e0e4737",
                 "spanId": "00f067aa0ba902b9",
                 "resource": {"type": "aiplatform.googleapis.com/ReasoningEngine"},
                 "jsonPayload": {
@@ -202,7 +199,7 @@ class TestTelemetryConfiguration(unittest.TestCase):
 
         elided_logs = [
             {
-                "trace": "projects/learning-lab-project/traces/4bf92f3577b34da6a3ce929d0e0e4736",
+                "trace": "projects/mission-intel-project/traces/4bf92f3577b34da6a3ce929d0e0e4736",
                 "spanId": "00f067aa0ba902b7",
                 "resource": {"type": "aiplatform.googleapis.com/ReasoningEngine"},
                 "jsonPayload": {

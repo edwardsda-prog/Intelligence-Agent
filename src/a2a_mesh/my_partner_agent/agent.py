@@ -33,16 +33,16 @@ def get_oauth_token() -> str:
         _CACHED_TOKEN = subprocess.check_output(['gcloud', 'auth', 'print-access-token'], stderr=subprocess.DEVNULL).decode('utf-8').strip()
         return _CACHED_TOKEN
 
-# LAB 7 OBJECTIVE: A2A JSON-RPC Protocol over Agent Gateway Transport.
+# SCENARIO 7 OBJECTIVE: A2A JSON-RPC Protocol over Agent Gateway Transport.
 # The Partner Agent invokes the Host Agent securely across domain boundaries via Agent Gateway / Reasoning Engine endpoint.
 def query_learning_lab_agent_via_a2a(prompt: str) -> str:
     """
-    Sends an Agent-to-Agent (A2A) protocol JSON-RPC request to the Learning Lab Host Agent across domain boundaries.
+    Sends an Agent-to-Agent (A2A) protocol JSON-RPC request to the Mission Intel Host Agent across domain boundaries.
     
     Args:
         prompt: Tactical intelligence query string (e.g. 'Request threat assessment for TGT-ALPHA-7').
     Returns:
-        Sanitized A2A intelligence report response from Learning Lab Host Agent.
+        Sanitized A2A intelligence report response from Mission Intel Host Agent.
     """
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
     from a2a_protocol import format_a2a_request
@@ -89,7 +89,7 @@ def query_learning_lab_agent_via_a2a(prompt: str) -> str:
     from my_host_agent.agent import process_a2a_inbound_query
     a2a_response_payload = process_a2a_inbound_query(a2a_request_payload)
 
-    print(f"\n📥 [A2A Protocol Inbound Local Response from Learning Lab Host Agent]:")
+    print(f"\n📥 [A2A Protocol Inbound Local Response from Mission Intel Host Agent]:")
     print(a2a_response_payload)
     print("----------------------------------------------------------------------\n")
 
@@ -118,7 +118,7 @@ root_agent = Agent(
     name="nato_marcom_coalition_agent",
     instruction=(
         "You are the NATO Allied Maritime Command (MARCOM) Coalition Partner Agent.\n"
-        "You do NOT have direct access to Learning Lab BigQuery databases or internal mission infrastructure.\n\n"
+        "You do NOT have direct access to Mission Intel BigQuery databases or internal mission infrastructure.\n\n"
         "INSTRUCTIONS:\n"
         "- When asked about maritime threats, radar tracks, or multi-domain telemetry in the North Sea sector, "
         "use `query_learning_lab_agent_via_a2a` to request intelligence via Agent-to-Agent (A2A) protocol.\n"
@@ -131,7 +131,7 @@ root_agent = Agent(
 if __name__ == "__main__":
     test_prompt = "Request current threat assessment and EW telemetry for target TGT-ALPHA-7 in North Sea."
     print("======================================================================")
-    print("🤝 LAB 7: ADK Agent-to-Agent (A2A) Protocol Coalition Demonstration")
+    print("🤝 SCENARIO 7: ADK Agent-to-Agent (A2A) Protocol Coalition Demonstration")
     print("======================================================================")
     print(f"NATO Agent Query: {test_prompt}\n")
     

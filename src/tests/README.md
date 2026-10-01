@@ -1,6 +1,6 @@
-# Automated Test Suite: Learning Lab Mission Intelligence
+# Automated Test Suite: Mission Intelligence
 
-This directory contains the automated test suite that verifies the reliability, security, and functionality of the Agentic AI labs.
+This directory contains the automated test suite that verifies the reliability, security, and functionality of the Agentic AI scenarios.
 
 ## Automated E2E Runner
 The primary entrypoint for running tests is `test_e2e.sh`. 
@@ -21,7 +21,7 @@ When running tests, ensure you are in the root directory of the repository or ex
 
 | File | Type | Coverage |
 | :--- | :--- | :--- |
-| `test_all_labs_prompts.py` | Integration | End-to-end execution of the 18 master prompts and 4 SQL queries spanning Labs 1-7. Validates cross-sensor correlation and output OPSEC redactions. |
+| `test_prompts.py` | Integration | End-to-end execution of the 18 master prompts and 4 SQL queries spanning Scenarios 1-7. Validates cross-sensor correlation and output OPSEC redactions. |
 | `test_caching.py` | Unit | Verifies Context Caching token calculation, TTL routing, and cache fallbacks. |
 | `test_grounding.py` | Unit | Verifies extractive segment parsing and `#page=N` Markdown deep link generation for PDF reporting. |
 | `test_hitl.py` | Unit | Verifies Human-in-the-Loop (HITL) cryptographic gating (`AUTH_<HASH>`) for kinetic/cyber strike intents. |

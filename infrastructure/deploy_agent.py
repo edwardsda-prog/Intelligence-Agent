@@ -36,7 +36,7 @@ TEST_PROMPTS = {
     ],
     "STRUCTURED_BIGQUERY": [
         "Query BigQuery table radar_telemetry for track TRK-901 and return velocity, bearing, and altitude.",
-        "List all friendly assets and ew_intercepts frequencies in dataset learning_labs_mission_data."
+        "List all friendly assets and ew_intercepts frequencies in dataset mission_data."
     ],
     "HUMINT_UNSTRUCTURED": [
         "Find the HUMINT PDF report for target TGT-ALPHA-7 and cross-reference with radar track TRK-901 in BigQuery.",
@@ -245,13 +245,13 @@ def update_agent_registry_and_gemini(project_id: str, location: str, re_id: str)
             service_name="mission-intel-agent",
             reasoning_engine_id=re_id,
             display_name="Mission Intel Agent",
-            description="Learning Lab Hybrid Mission Intelligence Agent"
+            description="Mission Intel Hybrid Mission Intelligence Agent"
         )
         print("   ✅ Agent Registry service binding updated.")
     except Exception as e:
         print(f"   ⚠️ Agent Registry update warning: {e}")
 
-    app_engines = ["learning-labs-mission-app", "gemini-enterprise-17898356_1789835603535", "gemini-enterprise-testdave"]
+    app_engines = ["mission-intel-app", "gemini-enterprise-17898356_1789835603535", "gemini-enterprise-testdave"]
     headers = {
         "Authorization": f"Bearer {token}",
         "X-Goog-User-Project": project_id,
@@ -271,7 +271,7 @@ def update_agent_registry_and_gemini(project_id: str, location: str, re_id: str)
         post_url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents"
         body = {
             "displayName": "Mission Intel Agent",
-            "description": "Learning Lab Hybrid Mission Intelligence Agent (SQL + Multimodal HUMINT PDFs)",
+            "description": "Mission Intel Hybrid Mission Intelligence Agent (SQL + Multimodal HUMINT PDFs)",
             "adkAgentDefinition": {
                 "provisionedReasoningEngine": {
                     "reasoningEngine": re_id

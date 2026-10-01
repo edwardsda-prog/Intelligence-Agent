@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Lab 6: Offline Evaluation Suite using Agent Platform Evaluation Service (Vertex AI EvalTask)
+Scenario 6: Offline Evaluation Suite using Agent Platform Evaluation Service (Vertex AI EvalTask)
 Evaluates ADK 2.0 Agent against Golden Dataset across 7 Quality Dimensions:
 1. Groundedness
 2. Factual Accuracy
@@ -36,12 +36,12 @@ vertexai.init(project=PROJECT_ID, location=LOCATION, credentials=creds)
 bq_client = bigquery.Client(credentials=creds, project=PROJECT_ID)
 
 print("======================================================================")
-print("🎯 LAB 6: Running Offline Agent Evaluation across 7 Quality Dimensions")
+print("🎯 SCENARIO 6: Running Offline Agent Evaluation across 7 Quality Dimensions")
 print(f"Project ID: {PROJECT_ID}")
 print(f"Location:   {LOCATION}")
 print("======================================================================")
 
-DATASET_ID = os.environ.get("DATASET_ID", "learning_labs_mission_data")
+DATASET_ID = os.environ.get("DATASET_ID", "mission_data")
 
 # 1. Load Golden Evaluation Dataset from BigQuery
 try:
@@ -202,7 +202,7 @@ with open(html_report_path, "w") as f, open("eval/eval_report.html", "w") as f2:
         ".scorecard th { background-color: #1a73e8; color: white; }"
         ".score { font-weight: bold; color: #1e8e3e; }"
         "</style></head><body>"
-        "<h1>🛡️ Learning Lab Agent Platform Evaluation Scorecard (Lab 6)</h1>"
+        "<h1>🛡️ Mission Intel Agent Platform Evaluation Scorecard (Scenario 6)</h1>"
         f"<p><b>Project:</b> {PROJECT_ID} | <b>Timestamp:</b> {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}</p>"
         "<table class='scorecard'><tr><th>Quality Dimension</th><th>Definition</th><th>Score (1-5 Scale)</th></tr>"
     )

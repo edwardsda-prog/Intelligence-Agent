@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Setup Script: Lab 5 - Unstructured Multimodal HUMINT Datastore & Hybrid Agent
+# Setup Script: Scenario 5 - Unstructured Multimodal HUMINT Datastore & Hybrid Agent
 # ==============================================================================
 
 set -e
@@ -14,8 +14,8 @@ PROJECT_ID=${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}
 PROJECT_ID=${PROJECT_ID:-"${PROJECT_ID}"}
 LOCATION=${LOCATION:-"us-central1"}
 DATASTORE_ID=${DATASTORE_ID:-""}
-BUCKET_NAME="gs://${PROJECT_ID}-learning-labs-humint-docs"
-ENGINE_ID="learning-labs-mission-app"
+BUCKET_NAME="gs://${PROJECT_ID}-humint-docs"
+ENGINE_ID="mission-intel-app"
 
 TOKEN=$(gcloud auth print-access-token)
 
@@ -30,7 +30,7 @@ if [ -z "$DATASTORE_ID" ]; then
 fi
 
 echo "======================================================================"
-echo "🚀 Provisioning Lab 5: Unstructured Multimodal HUMINT Datastore & Agent"
+echo "🚀 Provisioning Scenario 5: Unstructured Multimodal HUMINT Datastore & Agent"
 echo "Project ID:   $PROJECT_ID"
 echo "Region:       $LOCATION"
 echo "DataStore ID: $DATASTORE_ID"
@@ -108,11 +108,11 @@ if [ -z "$ENGINE_DS" ]; then
         -H "X-Goog-User-Project: ${PROJECT_ID}" \
         "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines?engineId=${ENGINE_ID}" \
         -d '{
-            "displayName": "Learning Lab Mission Intelligence Enterprise App",
+            "displayName": "Mission Intelligence Enterprise App",
             "solutionType": "SOLUTION_TYPE_SEARCH",
             "industryVertical": "GENERIC",
             "commonConfig": {
-                "companyName": "Learning Lab"
+                "companyName": "Mission Intel"
             },
             "searchEngineConfig": {
                 "searchTier": "SEARCH_TIER_ENTERPRISE",
@@ -199,7 +199,7 @@ ensure_agent_registered(
     service_name='mission-intel-agent',
     reasoning_engine_id='$RE_ID',
     display_name='Mission Intel Agent',
-    description='Learning Lab Hybrid Mission Intelligence Agent'
+    description='Mission Intel Hybrid Mission Intelligence Agent'
 )
 " || true
     echo "✅ Agent Registry Service binding updated!"
@@ -217,7 +217,7 @@ ensure_agent_registered(
             "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${APP_ENGINE_ID}/assistants/default_assistant/agents" \
             -d '{
                 "displayName": "Mission Intel Agent",
-                "description": "Learning Lab Hybrid Mission Intelligence Agent (SQL + Multimodal HUMINT PDFs)",
+                "description": "Mission Intel Hybrid Mission Intelligence Agent (SQL + Multimodal HUMINT PDFs)",
                 "adkAgentDefinition": {
                     "provisionedReasoningEngine": {
                         "reasoningEngine": "'"${RE_ID}"'"
@@ -231,7 +231,7 @@ ensure_agent_registered(
                     {"text": "Search unstructured HUMINT reports for optic crops of coastal missile batteries and list the MGRS grid coordinates."},
                     {"text": "Correlate cyber C2 threat indicators for APT-BEAR with the HUM-448 intelligence PDF report."}
                 ]
-            }' >/dev/null || echo "⚠️ Ignoring Agent Registration failure for Lab 5 because active Google Workspace account is missing a Gemini Enterprise license."
+            }' >/dev/null || echo "⚠️ Ignoring Agent Registration failure for Scenario 5 because active Google Workspace account is missing a Gemini Enterprise license."
     done
     echo "✅ Reasoning Engine & Agent Gateway successfully registered in Gemini Enterprise UI!"
 else
@@ -245,8 +245,8 @@ python3 ../src/tests/run_offline_evaluation.py || true
 
 echo ""
 echo "======================================================================"
-echo "🎉 Lab 5 Setup Complete!"
-echo "DataStore: gs://${PROJECT_ID}-learning-labs-humint-docs -> $DATASTORE_ID"
+echo "🎉 Scenario 5 Setup Complete!"
+echo "DataStore: gs://${PROJECT_ID}-humint-docs -> $DATASTORE_ID"
 echo "Documents: ./documents/*.pdf"
 echo "======================================================================"
 

@@ -11,7 +11,7 @@ class TestDashboardsAndTelemetry(unittest.TestCase):
         self.base_dir = os.path.join(os.path.dirname(__file__), "..")
 
     def test_dashboard_json_validity(self):
-        """Verifies that all lab dashboard JSON files are valid JSON and contain expected keys."""
+        """Verifies that all scenario dashboard JSON files are valid JSON and contain expected keys."""
         dashboards = [
             os.path.join(self.base_dir, "lab5", "code", "dashboard_observability.json"),
             os.path.join(self.base_dir, "lab5", "code", "dashboard_model_armor.json"),

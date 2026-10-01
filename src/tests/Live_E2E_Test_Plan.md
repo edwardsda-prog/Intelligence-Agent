@@ -10,7 +10,7 @@
 ## 1. Executive Summary & Objective
 The objective of this test cycle is to validate the complete deployment, security guardrails, and orchestration capabilities of the Agentic AI ecosystem. This plan covers both the **Local ADK Sandbox (SQLite)** for fast inner-loop validation and the **Live Google Cloud Infrastructure** (BigQuery, Vertex AI, Reasoning Engine, Cloud Run, Model Armor) for production-grade validation.
 
-Crucially, this plan also guarantees **100% accuracy of the Customer Lab Guides** through a hybrid approach combining automated static cross-referencing and a manual Human User Acceptance Testing (UAT) Dry Run.
+Crucially, this plan also guarantees **100% accuracy of the Customer Scenario Guides** through a hybrid approach combining automated static cross-referencing and a manual Human User Acceptance Testing (UAT) Dry Run.
 
 ## 2. Prerequisites & Entry Criteria
 *   **Target Project:** A designated, billing-enabled Google Cloud Project.
@@ -23,12 +23,12 @@ Crucially, this plan also guarantees **100% accuracy of the Customer Lab Guides*
 ## 3. Test Execution Phases
 
 ### Phase 0: Automated Markdown Verification
-**Objective:** Guarantee that the code snippets, SQL queries, and interactive prompts embedded in the Markdown Lab Guides exactly match the underlying production codebase and test suite without drift.
+**Objective:** Guarantee that the code snippets, SQL queries, and interactive prompts embedded in the Markdown Scenario Guides exactly match the underlying production codebase and test suite without drift.
 *   **Action:** Execute the dedicated markdown accuracy test suite.
     ```bash
     python3 tests/test_markdown_accuracy.py
     ```
-*   **Success Criteria:** The Python script successfully extracts all code blocks and asserts strict character-for-character parity with `test_all_labs_prompts.py`, `agent.py`, and infrastructure scripts.
+*   **Success Criteria:** The Python script successfully extracts all code blocks and asserts strict character-for-character parity with `test_prompts.py`, `agent.py`, and infrastructure scripts.
 
 ### Phase 1: Sterile Environment Preparation (Teardown)
 **Objective:** Eradicate all existing state, both local and in the cloud, to ensure a pristine test baseline.
@@ -63,7 +63,7 @@ Crucially, this plan also guarantees **100% accuracy of the Customer Lab Guides*
 
 ### Phase 4: Human UAT Dry Run (Console/UI Navigation)
 **Objective:** Guarantee 100% accuracy of the UI navigation steps (e.g., clicking through the Google Cloud Console) that cannot be statically parsed.
-*   **Action:** A human tester manually walks through Labs 1-7 in the sterile Google Cloud Project.
+*   **Action:** A human tester manually walks through Scenarios 1-7 in the sterile Google Cloud Project.
 *   **Issue Handling:** If the Google Cloud Console UI has drifted (e.g., a button was renamed), the tester **dynamically fixes the markdown files on the fly** during the execution run, committing the changes without blocking the formal test pipeline.
 
 ### Phase 5: Artifact Review & Final Sign-Off
@@ -72,7 +72,7 @@ Crucially, this plan also guarantees **100% accuracy of the Customer Lab Guides*
 *   **Success Criteria:**
     *   **100% Pass Rate** on all test vectors across both `--mock` and `--live` executions.
     *   Time-To-First-Token (TTFT) metrics fall within acceptable SLAs.
-    *   Zero coordinate leakage on Lab 4 OPSEC tests.
+    *   Zero coordinate leakage on Scenario 4 OPSEC tests.
     *   Tester confirmation that all UI instructions are strictly accurate as of today.
 
 ---

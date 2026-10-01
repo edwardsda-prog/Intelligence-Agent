@@ -1,8 +1,8 @@
 -- ==============================================================================
--- Golden Evaluation Dataset: Learning Lab Multi-Domain Mission Intelligence
+-- Golden Evaluation Dataset: Mission Intel Multi-Domain Mission Intelligence
 -- ==============================================================================
 
-CREATE TABLE IF NOT EXISTS `learning_labs_mission_data.golden_eval_dataset` (
+CREATE TABLE IF NOT EXISTS `mission_data.golden_eval_dataset` (
     eval_id STRING,
     prompt STRING,
     reference_context STRING,
@@ -11,14 +11,14 @@ CREATE TABLE IF NOT EXISTS `learning_labs_mission_data.golden_eval_dataset` (
     user_context STRING
 );
 
-DELETE FROM `learning_labs_mission_data.golden_eval_dataset` WHERE TRUE;
+DELETE FROM `mission_data.golden_eval_dataset` WHERE TRUE;
 
-INSERT INTO `learning_labs_mission_data.golden_eval_dataset` 
+INSERT INTO `mission_data.golden_eval_dataset` 
 (eval_id, prompt, reference_context, ground_truth, category, user_context)
 VALUES
 (
     'EVAL-001',
-    'Find the EW bearings and emitter details associated with radar track TRK-901 in learning_labs_mission_data.',
+    'Find the EW bearings and emitter details associated with radar track TRK-901 in mission_data.',
     'radar_telemetry: TRK-901, target TGT-ALPHA-7. ew_intercepts: Mineral-ME Naval Fire Control Radar, frequency 9.41 GHz, PRF 1.65 kHz, threat level CRITICAL, bearings 145.2° and 89.5°.',
     'Track TRK-901 (TGT-ALPHA-7) is associated with a Mineral-ME Naval Fire Control Radar operating at 9.41 GHz with a PRF of 1.65 kHz. Threat Level is CRITICAL with EW bearings recorded at 145.2° (Site-A) and 89.5° (Site-B).',
     'Radar & EW Fusion',

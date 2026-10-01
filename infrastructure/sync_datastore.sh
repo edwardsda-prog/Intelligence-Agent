@@ -9,7 +9,7 @@ set -e
 PROJECT_ID=${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}
 PROJECT_ID=${PROJECT_ID:-"${PROJECT_ID}"}
 LOCATION=${LOCATION:-"us-central1"}
-BUCKET_NAME="gs://${PROJECT_ID}-learning-labs-humint-docs"
+BUCKET_NAME="gs://${PROJECT_ID}-humint-docs"
 
 echo "======================================================================"
 echo "🔄 Synchronizing GCS documents to Discovery Engine..."
@@ -42,5 +42,5 @@ if [ -n "$EXISTING_DS" ]; then
     echo "✅ Datastore synchronization triggered successfully."
 else
     echo "ℹ️ No active Discovery Engine DataStore found starting with 'humint-pdf-datastore'. Skipping sync."
-    echo "   (This is expected if Lab 5 has not been deployed yet)."
+    echo "   (This is expected if Scenario 5 has not been deployed yet)."
 fi

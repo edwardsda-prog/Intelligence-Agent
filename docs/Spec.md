@@ -1,4 +1,4 @@
-# Feature Specification: Learning Lab Mission Intelligence Ecosystem
+# Feature Specification: Mission Intelligence Ecosystem
 
 **Feature Branch**: `main`  
 **Created**: 2026-09-26  
@@ -15,41 +15,38 @@
 
 ```bash
 # Bootstrap & Environment Provisioning
-./setup.sh
+./infrastructure/setup.sh
 
 # Run Complete End-to-End Automated Test Suite (39 Tests in Mock / Hermetic Mode)
-./test_e2e.sh --mock
+./src/tests/test_e2e.sh --mock
 
 # Run Live Google Cloud Platform Test Suite
-./test_e2e.sh
+./src/tests/test_e2e.sh
 
 # Execute Common Module Unit Tests Directly
-python3 -m unittest discover -s tests -p 'test_*.py' -v
+python3 -m unittest discover -s src/tests -p 'test_*.py' -v
 
-# Run Lab 6 Offline Evaluation Benchmark (7 Quality Dimensions)
-python3 lab6/run_offline_evaluation.py --mock
+# Run Offline Evaluation Benchmark (7 Quality Dimensions)
+python3 src/tests/run_offline_evaluation.py --mock
 
 # Validate Shell Scripts Syntax
-bash -n setup.sh && bash -n test_e2e.sh
+bash -n infrastructure/setup.sh && bash -n src/tests/test_e2e.sh
 ```
 
 ### 1.2. Testing & Conformance
-* **Test Runner:** Python `unittest` harness integrated via [`test_e2e.sh`](test_e2e.sh).
+* **Test Runner:** Python `unittest` harness integrated via [`test_e2e.sh`](src/tests/test_e2e.sh).
 * **Test Suites:**
-  * Unit tests reside in [`tests/`](tests/) (`test_data.py`, `test_resilience.py`, `test_telemetry.py`, `test_hitl.py`, `test_caching.py`, `test_grounding.py`, `test_performance.py`, `test_opsec.py`, `test_rag.py`).
-  * Conformance tests evaluate all 7 labs sequentially, validating 17 Unit Tests, 4 Analytical SQL Queries, and 18 Interactive Student Prompts.
-* **Test Reports:** Auto-generated at [`test_e2e_report.md`](test_e2e_report.md) and [`test_e2e_report.html`](test_e2e_report.html).
+  * Unit tests reside in [`src/tests/`](src/tests/) (`test_data.py`, `test_resilience.py`, `test_telemetry.py`, `test_hitl.py`, `test_caching.py`, `test_grounding.py`, `test_performance.py`, `test_opsec.py`, `test_rag.py`).
+  * Conformance tests evaluate all scenarios sequentially, validating 17 Unit Tests, 4 Analytical SQL Queries, and 18 Interactive Prompts.
 
 ### 1.3. Project Structure & File Layout
-* `lab1/`: BigQuery multi-domain dataset, partitioned sensor schemas, and analytical view `v_multi_domain_intelligence`.
-* `lab2/`: Agent Developer Kit (ADK 2.0) agent runtime, ReAct cognitive loops, and sub-50ms Fast-Path intercepts.
-* `lab3/`: Model Context Protocol (MCP) server on Cloud Run, resilient circuit breakers, and dual OpenTelemetry/audit logging.
-* `lab4/`: DevSecOps guardrails, Model Armor MGRS coordinate redaction, and Human-in-the-Loop (HITL) cryptographic authorization gate.
-* `lab5/`: Multimodal RAG with Google Cloud Discovery Engine, `#page=N` deep-link citations, and Vertex AI Context Caching on global endpoint.
-* `lab6/`: Vertex AI `EvalTask` offline evaluation framework benchmarking across the 7 Quality Dimensions.
-* `lab7/`: Secure Agent-to-Agent (A2A) protocol federation, Agent Gateway routing, and NATO caveat boundary enforcement.
-* `common/`: Shared resilient libraries (`resilience.py`, `telemetry.py`, `caching.py`, `hitl.py`).
-* `tests/`: End-to-end verification and unit test suite.
+* `src/agent/`: Agent Developer Kit (ADK 2.0) agent runtime, ReAct cognitive loops, and sub-50ms Fast-Path intercepts.
+* `src/a2a_mesh/`: Secure Agent-to-Agent (A2A) protocol federation, Agent Gateway routing, and NATO caveat boundary enforcement.
+* `src/common/`: Shared resilient libraries (`resilience.py`, `telemetry.py`, `caching.py`, `hitl.py`).
+* `src/tests/`: End-to-end verification and unit test suite.
+* `infrastructure/`: Setup scripts, deploy scripts, and schema files.
+* `data/`: Structured SQL and Unstructured HUMINT data used for population and testing.
+* `docs/`: Reference documentation, architecture plans, and prompt guides.
 
 ### 1.4. Code Style & Technical Conventions
 * **Language & Typing:** Strictly Python 3.11+ using explicit type annotations (`typing.Dict`, `typing.List`, `typing.Optional`, `typing.Any`).
@@ -60,19 +57,19 @@ bash -n setup.sh && bash -n test_e2e.sh
 ### 1.5. Git Workflow
 * **Branch Strategy:** Work occurs on `main` for release baselines; feature topics branch off `main`.
 * **Commit Conventions:** Follow Conventional Commits format: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`.
-* **Pre-Commit Gate:** Must execute `./test_e2e.sh --mock` and verify all 39 tests pass with 0 regressions before committing.
+* **Pre-Commit Gate:** Must execute `./src/tests/test_e2e.sh --mock` and verify all 39 tests pass with 0 regressions before committing.
 
 ### 1.6. Three-Tier Boundaries (Agent Rules of Engagement)
 
 * **✅ Always Do:**
-  * Run `./test_e2e.sh --mock` before proposing git commits.
+  * Run `./src/tests/test_e2e.sh --mock` before proposing git commits.
   * Maintain security classification strictly as `Demonstrator` (or `Demonstrator // REL TO NATO`).
   * Source all cloud environment parameters dynamically (`PROJECT_ID`, `LOCATION`, `STAGING_BUCKET`).
   * Route Gemini 3.8 Flash (`gemini-3.8-flash`) Context Caching to `location="global"`.
   * Ensure dual telemetry (OpenTelemetry spans and full prompt/response message logging) is configured.
 
 * **⚠️ Ask First:**
-  * Altering BigQuery table schemas or column names in `learning_labs_mission_data`.
+  * Altering BigQuery table schemas or column names in `mission_data`.
   * Introducing new external Python dependencies to `requirements.txt`.
   * Changing circuit breaker failure thresholds or cooldown durations in production configs.
   * Modifying IAM role assignments or service account permissions in `setup.sh`.
@@ -95,7 +92,7 @@ I want to query an integrated Common Operational Picture (COP) across radar, ele
 So that I can identify and correlate incoming hostile threats in seconds rather than hours.
 
 * **Why this priority:** Establishes the foundational structured data tier of the mission intelligence ecosystem; without correlated sensor data, higher-level reasoning cannot function.
-* **Independent Test:** Can be tested independently by querying BigQuery view `v_multi_domain_intelligence` directly or via `lab1/setup_lab1.sh` and asserting correlated kinematic and electronic emission attributes for track `TRK-901`.
+* **Independent Test:** Can be tested independently by querying BigQuery view `v_multi_domain_intelligence` directly and asserting correlated kinematic and electronic emission attributes for track `TRK-901`.
 * **Acceptance Scenarios:**
   1. **Given** radar contact `TRK-901` operating at 45 knots in the mission database, **When** the analyst queries for correlated electronic warfare emitters, **Then** the system joins `radar_telemetry` and `ew_intercepts` to reveal a Project 22800 Karakurt-Class Corvette emitting Mineral-ME radar signals at 9.41 GHz.
   2. **Given** active cyber threat alert `CYB-001`, **When** cross-referenced with spatial sensor telemetry, **Then** the system correlates threat actor APT-BEAR targeting tactical frequencies with physical contact `TRK-901`.
@@ -109,7 +106,7 @@ I want an autonomous agent that plans, executes multi-hop SQL tool calls, and re
 So that mission queries succeed continuously without crashing during high-tempo operations.
 
 * **Why this priority:** Enables autonomous multi-hop reasoning and self-healing query logic, reducing human cognitive load during tactical assessments.
-* **Independent Test:** Can be tested independently by executing `python3 -m unittest tests/test_data.py` and running Lab 2 prompts `L2-P1` (ReAct) and `L2-P2` (Schema error recovery).
+* **Independent Test:** Can be tested independently by executing `python3 -m unittest src/tests/test_data.py`.
 * **Acceptance Scenarios:**
   1. **Given** an operational query requiring multi-hop analysis, **When** the agent evaluates the prompt, **Then** it follows the ReAct cycle (Thought $\rightarrow$ Action $\rightarrow$ Observation $\rightarrow$ Synthesis), emitting structured `FunctionCall` requests against BigQuery.
   2. **Given** an agent SQL query targeting an obsolete column name in `radar_telemetry`, **When** the database raises a schema exception, **Then** the agent catches the error, reflects upon the available schema, re-issues the corrected query against `friendly_assets`, and returns an accurate answer.
@@ -124,7 +121,7 @@ I want database tools isolated on serverless Cloud Run microservices via the Mod
 So that agent compute is decoupled from data storage and all reasoning steps are verifiably compliant with defense audit standards.
 
 * **Why this priority:** Enforces zero-trust sandboxing and satisfies mandatory defense compliance for distributed observability and tamper-evident logging.
-* **Independent Test:** Can be tested independently via `python3 -m unittest tests/test_telemetry.py` and `tests/test_resilience.py`, verifying JSON-RPC MCP calls, circuit breaker tripping, and telemetry event captures.
+* **Independent Test:** Can be tested independently via `python3 -m unittest src/tests/test_telemetry.py` and `src/tests/test_resilience.py`, verifying JSON-RPC MCP calls, circuit breaker tripping, and telemetry event captures.
 * **Acceptance Scenarios:**
   1. **Given** a requirement for BigQuery access, **When** the agent executes a database query, **Then** the query dispatches via JSON-RPC 2.0 to a Cloud Run MCP microservice without database credentials residing in the agent container.
   2. **Given** transient network packet loss or downstream service degradation, **When** tool calls encounter repeated 503 errors, **Then** exponential backoff retries 3 times before the 3-state Circuit Breaker trips to `OPEN`, returning graceful fallback telemetry.
@@ -139,11 +136,11 @@ I want automated redaction of sensitive tactical coordinates and mandatory crypt
 So that operational grid positions are never leaked and autonomous AI can never trigger lethal or offensive engagements without human command authority.
 
 * **Why this priority:** Enforces UK MOD Joint Command doctrine and military rules of engagement; safety and OPSEC are non-negotiable mission constraints.
-* **Independent Test:** Can be tested independently via `python3 -m unittest tests/test_opsec.py` and `tests/test_hitl.py`, verifying regex redaction and cryptographic token gates.
+* **Independent Test:** Can be tested independently via `python3 -m unittest src/tests/test_opsec.py` and `src/tests/test_hitl.py`, verifying regex redaction and cryptographic token gates.
 * **Acceptance Scenarios:**
   1. **Given** a model response containing raw Military Grid Reference System (MGRS) coordinates (e.g., `30UGC9914906064`), **When** processed by the `after_model_callback`, **Then** the coordinates are replaced with `[CUSTOM_MGRS_COORDINATES]` via Model Armor or fallback regex.
   2. **Given** a prompt requesting kinetic missile strikes or offensive cyber strikes on `TGT-DELTA-9`, **When** the agent generates an engagement advisory, **Then** the action is held under `[HUMAN-IN-THE-LOOP HOLD REQUIRED]` demanding confirmation token `AUTH_<HASH>`.
-  3. **Given** a held kinetic engagement advisory, **When** the human watch officer provides the valid cryptographic token `AUTH_C3383D72D124`, **Then** the advisory is released to the command console.
+  3. **Given** a held kinetic advisory, **When** the human watch officer provides the valid cryptographic token `AUTH_C3383D72D124`, **Then** the advisory is released to the command console.
 
 ---
 
@@ -154,7 +151,7 @@ I want to query unstructured multimodal HUMINT PDF dossiers with exact page-leve
 So that intelligence claims are visually auditable and multi-turn sessions achieve sub-second response times at minimal token expense.
 
 * **Why this priority:** Eliminates hallucinations by anchoring generative summaries in verifiable PDF source pages while optimizing token latency and expenditure.
-* **Independent Test:** Can be tested independently via `python3 -m unittest tests/test_rag.py`, `tests/test_grounding.py`, and `tests/test_caching.py`.
+* **Independent Test:** Can be tested independently via `python3 -m unittest src/tests/test_rag.py`, `src/tests/test_grounding.py`, and `src/tests/test_caching.py`.
 * **Acceptance Scenarios:**
   1. **Given** 10 classified HUMINT PDF dossiers indexed in Discovery Engine, **When** the agent performs semantic vector retrieval, **Then** it receives extractive text segments and formats citations as clickable deep links with page anchors: `[HUM-448, Page 2](gs://...#page=2)`.
   2. **Given** a static mission context corpus exceeding 32,768 tokens (schemas and field reports), **When** a multi-turn session begins, **Then** the system initializes a Vertex AI `CachedContent` resource routed to `location="global"` for `gemini-3.8-flash`, cutting Time-to-First-Token (TTFT) by $>60\%$ and input token billing by $\ge 75\%$.
@@ -168,7 +165,7 @@ I want automated offline evaluation benchmarking the agent against a golden inte
 So that regressions in groundedness, safety, and accuracy are algorithmically caught before production deployment.
 
 * **Why this priority:** Replaces subjective "vibe-coding" with rigorous, reproducible empirical measurement and continuous CI/CD quality gates.
-* **Independent Test:** Can be tested independently via `python3 lab6/run_offline_evaluation.py --mock`, scoring results against `golden_eval_dataset.jsonl`.
+* **Independent Test:** Can be tested independently via `python3 src/tests/run_offline_evaluation.py --mock`, scoring results against `golden_eval_dataset.jsonl`.
 * **Acceptance Scenarios:**
   1. **Given** a golden evaluation dataset containing multi-domain mission questions and ground-truth answers, **When** evaluated using Vertex AI `EvalTask`, **Then** the agent achieves an aggregate score $\ge 4.5/5.0$.
   2. **Given** evaluation runs assessing Safety and OPSEC, **When** the evaluation harness processes adversarial or coordinate-leaking prompts, **Then** the Safety score must be strictly $5.0/5.0$ (zero tolerance for leaks).
@@ -182,7 +179,7 @@ I want allied partner agents to query the UK Host Agent via the Agent-to-Agent (
 So that coalition intelligence sharing is automated while preserving UK national data isolation and security classification caveats.
 
 * **Why this priority:** Enables multinational defense collaboration adhering to NATO-first interoperability doctrine without exposing internal national databases.
-* **Independent Test:** Can be tested independently via `python3 lab7/simulate_a2a_federation.py --mock` and verifying JSON-RPC 2.0 payloads and caveat application.
+* **Independent Test:** Can be tested independently via `python3 src/a2a_mesh/simulate_a2a_federation.py --mock` and verifying JSON-RPC 2.0 payloads and caveat application.
 * **Acceptance Scenarios:**
   1. **Given** an authorized query from a NATO Coalition Partner Agent, **When** received at the Agent Gateway, **Then** the Host Agent authenticates the request via `agent_card.json` and returns sanitized tactical intelligence marked `Demonstrator // REL TO NATO`.
   2. **Given** a coalition partner request seeking kinetic strike authorization, **When** evaluated by the Host Agent, **Then** the request is rejected with a secure policy error, ensuring foreign agents cannot bypass domestic command authority.
@@ -223,7 +220,7 @@ So that coalition intelligence sharing is automated while preserving UK national
 * **FR-018**: System MUST format all unstructured intelligence citations as Markdown deep links with page-level anchors: `[DocID, Page N: Title](gs://bucket/file.pdf#page=N)`.
 * **FR-019**: When static context (schemas, doctrine, dossiers) exceeds 32,768 tokens, the system MUST create and reuse a Vertex AI `CachedContent` resource with a 60-minute TTL.
 * **FR-020**: Vertex AI `CachedContent` resources for `gemini-3.8-flash` MUST be provisioned using `location="global"` to prevent regional HTTP 404 resource errors.
-* **FR-021**: System MUST provide an automated offline evaluation script (`lab6/run_offline_evaluation.py`) executing Vertex AI `EvalTask` against a golden dataset stored in BigQuery.
+* **FR-021**: System MUST provide an automated offline evaluation script (`src/tests/run_offline_evaluation.py`) executing Vertex AI `EvalTask` against a golden dataset stored in BigQuery.
 * **FR-022**: System MUST score evaluation runs across 7 Quality Dimensions: Groundedness, Factual Accuracy, Instruction Following, Safety/OPSEC, Latency/Cost Efficiency, Actionability, and Digestibility.
 * **FR-023**: System MUST expose an Agent-to-Agent (A2A) JSON-RPC 2.0 federation endpoint on Google Cloud Agent Gateway.
 * **FR-024**: Host Agent MUST publish an Agent Card (`agent_card.json`) declaring capabilities, protocols, and classification caveat `Demonstrator // REL TO NATO`.
@@ -328,7 +325,7 @@ erDiagram
 * **SC-006**: **Human-in-the-Loop Doctrinal Safety:** 100% of kinetic strike and offensive cyber advisories MUST be intercepted by the hold gate until verified with a cryptographic token.
 * **SC-007**: **Offline Evaluation Benchmark Score:** The agent MUST achieve an aggregate score of $\ge \mathbf{4.5 / 5.0}$ across the 7 Quality Dimensions when evaluated against `golden_eval_dataset.jsonl`.
 * **SC-008**: **Safety & OPSEC Evaluation Dimension:** The agent MUST score strictly $\mathbf{5.0 / 5.0}$ on the Safety & OPSEC dimension in offline evaluation.
-* **SC-009**: **Automated Test Suite Pass Rate:** 100% of the 39 tests in [`test_e2e.sh --mock`](test_e2e.sh) (17 Unit Tests, 4 SQL Queries, 18 Interactive Student Prompts) MUST pass.
+* **SC-009**: **Automated Test Suite Pass Rate:** 100% of the 39 tests in [`test_e2e.sh --mock`](test_e2e.sh) MUST pass.
 * **SC-010**: **Dual Telemetry Collection Integrity:** 100% of agent reasoning turns MUST emit OpenTelemetry spans and un-elided audit logs without `<elided>` placeholders.
 
 ---
@@ -342,17 +339,3 @@ erDiagram
 * **AS-005 (Simulated Sensor Ingestion):** In the demonstrator environment, sensor telemetry is stored in partitioned BigQuery tables mimicking real-time tactical datalinks (Link 16 / OTH-T).
 * **AS-006 (Zero Customer Data Retention):** All foundation model interactions are governed by enterprise zero-data-retention agreements; customer prompts and telemetry are never used to train base foundation models.
 * **AS-007 (Security Classification):** The system classification is strictly `Demonstrator` (with coalition exports marked `Demonstrator // REL TO NATO`).
-
----
-
-## 6. Curriculum Pedagogical Alignment (Master Study Guide)
-
-The system architecture and lab series align directly with the core engineering disciplines from the Master Study Guide:
-
-* **Lab 1 (Structured Telemetry Platform):** Offloading heavy computation to BigQuery via SQL pushdown rather than relying on generative model arithmetic; implementing partitioned, clustered schemas; eliminating join hallucinations using `v_multi_domain_intelligence`.
-* **Lab 2 (Spec-Driven Development & ReAct Loops):** Engineering cognitive ReAct loops (Thought $\rightarrow$ Action $\rightarrow$ Observation $\rightarrow$ Synthesis) in ADK 2.0; implementing autonomous schema error recovery; enforcing context engineering (`CONTEXT.md`) to prevent Context Rot; executing sub-50ms Fast-Path token routing.
-* **Lab 3 (Decoupled Sandboxing & Observability):** Enforcing $N \times M \to N + M$ tool decoupling via Cloud Run MCP microservices; collecting dual telemetry (OpenTelemetry GenAI spans in Cloud Trace + un-elided message logs in Cloud Logging); ensuring egress resilience via 3-state Circuit Breakers.
-* **Lab 4 (DevSecOps Guardrails & Doctrinal Authority):** Inline machine-speed sanitization using Model Armor and Cloud DLP; MGRS coordinate tokenization (`[CUSTOM_MGRS_COORDINATES]`) with local fallback; non-delegable Human-in-the-Loop gates requiring cryptographic tokens (`AUTH_<HASH>`).
-* **Lab 5 (Unstructured Multimodal RAG & Prefix Caching):** Sub-second single-pass vector retrieval via Discovery Engine; verifiable page-level anchoring (`#page=N`); Vertex AI Context Caching on global endpoint cutting TTFT by $>60\%$ and input token billing by $\ge 75\%$.
-* **Lab 6 (Harness Engineering & Scientific Hillclimbing):** Replacing subjective "vibe-coding" with automated Vertex AI `EvalTask` offline evaluations against BigQuery golden datasets across the 7 Quality Dimensions with automated CI/CD release gates ($\ge 4.5/5.0$).
-* **Lab 7 (Decentralized Multi-Agent Federation):** Cross-organization Agent-to-Agent (A2A) JSON-RPC 2.0 federation over Agent Gateway; self-describing Agent Cards (`agent_card.json`); automatic NATO caveat application (`Demonstrator // REL TO NATO`); strict enforcement of secure national kinetic command authority.

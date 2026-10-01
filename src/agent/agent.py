@@ -37,11 +37,11 @@ def resolve_project_id() -> str:
 
 PROJECT_ID = resolve_project_id()
 LOCATION = os.environ.get("LOCATION", "us-central1")
-ENGINE_ID = os.environ.get("ENGINE_ID", "learning-labs-mission-app")
+ENGINE_ID = os.environ.get("ENGINE_ID", "mission-intel-app")
 DATASTORE_ID = os.environ.get("DATASTORE_ID", "humint-pdf-datastore-1790507563")
 
 # --- OPTIMIZATION 1: Tier 1 Fast-Path Intercept ---
-# LEARNING LAB OBJECTIVE: Performance & Cost Optimization (Latency & Token Caching equivalent).
+# LEARNING SCENARIO OBJECTIVE: Performance & Cost Optimization (Latency & Token Caching equivalent).
 # BEST PRACTICE: Intercepting static queries (greetings, status) BEFORE they hit the LLM. 
 # This effectively acts as a semantic cache, reducing API costs to $0 and dropping latency to <50ms.
 GREETING_TOKENS = {"hi", "hello", "ping", "status", "help", "who are you", "test"}
@@ -65,7 +65,7 @@ def fast_path_intercept(user_prompt: str) -> str | None:
         log_sre_telemetry("fast_path_intercept_hit", {"user_prompt": user_prompt, "latency_ms": 0.5, "tokens_used": 0})
         return (
             "SYSTEM READY: UK MOD Joint Command Intelligence Assistant online. Multi-domain telemetry Operational.\n\n"
-            "🛡️ **Learning Lab Multi-Domain Mission Intelligence Agent Online**\n\n"
+            "🛡️ **Multi-Domain Mission Intelligence Agent Online**\n\n"
             "**Operational Capabilities Ready:**\n"
             "• **Structured Data**: BigQuery Telemetry (`radar_telemetry`, `ew_intercepts`, `satellite_recon`, `cyber_threat_intel`, `friendly_assets`)\n"
             "• **Unstructured Data**: Discovery Engine Search (`humint-pdf-datastore`, 10 classified HUMINT PDF field reports)\n"
@@ -75,7 +75,7 @@ def fast_path_intercept(user_prompt: str) -> str | None:
     return None
 
 # --- OPTIMIZATION 2: Eager Startup Warmup & Auth Caching ---
-# LEARNING LAB OBJECTIVE: Performance Optimization.
+# LEARNING SCENARIO OBJECTIVE: Performance Optimization.
 # BEST PRACTICE: Cache authentication tokens and pre-warm connections in the global scope.
 # This prevents "cold-start" delays on the first user query, vastly improving UX.
 _cached_creds = None
@@ -159,7 +159,7 @@ except Exception as e:
     from google.adk.tools import FunctionTool
     @retry_with_backoff(max_attempts=3, initial_delay=1.0, factor=2.0, circuit_breaker=bq_circuit_breaker, fallback=fallback_bigquery)
     def execute_bigquery_sql(sql_query: str) -> str:
-        """Executes a SQL query against BigQuery dataset learning_labs_mission_data."""
+        """Executes a SQL query against BigQuery dataset mission_data."""
         with instrument_tool_span("execute_bigquery_sql", sql_query) as span:
             try:
                 # Instrument SPIFFE Agent Identity
@@ -194,7 +194,7 @@ except Exception as e:
     mcp_toolset = FunctionTool(execute_bigquery_sql)
 
 # 2. Unstructured Data Tool (Custom Function calling Discovery Engine Search API with OpenTelemetry Semantic Instrumentation)
-# LAB 5 OBJECTIVE: Unstructured Multimodal RAG.
+# SCENARIO 5 OBJECTIVE: Unstructured Multimodal RAG.
 # Queries the Discovery Engine endpoint to retrieve text snippets and metadata from PDF field reports.
 @retry_with_backoff(max_attempts=3, initial_delay=1.0, factor=2.0, circuit_breaker=discovery_circuit_breaker, fallback=fallback_humint)
 def search_humint_reports(query: str) -> str:
@@ -270,7 +270,7 @@ def search_humint_reports(query: str) -> str:
                     gcs_uri = gcs_link
                 else:
                     file_name = struct_data.get("file") or f"{doc_id}.pdf"
-                    fallback_bucket = os.environ.get("GCS_BUCKET", "antig-dave-learning-labs-humint-docs")
+                    fallback_bucket = os.environ.get("GCS_BUCKET", "antig-dave-humint-docs")
                     gcs_uri = f"gs://{fallback_bucket}/{file_name}"
 
                 # Convert gs:// URI to authenticated Google Cloud Storage URL
@@ -337,7 +337,7 @@ def search_humint_reports(query: str) -> str:
 
 
 # --- OPTIMIZATION 4: Model Armor OPSEC Guardrails ---
-# LAB 5 OBJECTIVE: DevSecOps OPSEC Guardrails.
+# SCENARIO 5 OBJECTIVE: DevSecOps OPSEC Guardrails.
 # Applies Zero-Trust AI security by sanitizing LLM responses via the Cloud Model Armor API.
 # Replaces sensitive regex patterns like MGRS coordinates.
 def apply_model_armor(context, response):
@@ -454,7 +454,7 @@ def apply_model_armor(context, response):
     return response
 
 # --- OPTIMIZATION 3: Model Right-Sizing ---
-# LEARNING LAB OBJECTIVE: Performance & Cost Optimization.
+# LEARNING SCENARIO OBJECTIVE: Performance & Cost Optimization.
 # BEST PRACTICE: Using Gemini Flash instead of Pro for lower cost per inference and higher throughput.
 
 MODEL_NAME = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
@@ -551,9 +551,9 @@ def get_agent_instruction(context=None):
         "- UNSTRUCTURED SEARCH ONLY: If the prompt asks specifically to search HUMINT reports or field documents, call `search_humint_reports` ONLY. Do NOT query BigQuery. Query the Data Store in Gemini Enterprise.\n\n"
         "- MULTI-DOMAIN CORRELATION: When asked to correlate structured telemetry with field reports, execute at most ONE SQL query and ONE HUMINT search query. Do NOT engage in iterative retry loops or repeated queries if zero records are found.\n\n"
         f"1. STRUCTURED DATASETS & BIGQUERY SCHEMA DISCOVERY:\n"
-        f"- Primary Unified View (PREFERRED FOR MULTI-DOMAIN QUERIES): `{PROJECT_ID}.learning_labs_mission_data.v_multi_domain_intelligence` (`track_id`, `target_id`, `radar_signature`, `ew_bearing`, `cyber_actor`, `humint_content`, `friendly_unit`).\n"
+        f"- Primary Unified View (PREFERRED FOR MULTI-DOMAIN QUERIES): `{PROJECT_ID}.mission_data.v_multi_domain_intelligence` (`track_id`, `target_id`, `radar_signature`, `ew_bearing`, `cyber_actor`, `humint_content`, `friendly_unit`).\n"
         f"- Individual Base Tables: `radar_telemetry`, `ew_intercepts`, `ew_bearings`, `satellite_recon`, `cyber_threat_intel`, `friendly_assets`.\n"
-        f"- DYNAMIC SCHEMA DISCOVERY: If unsure which table or column contains specific data, query BigQuery INFORMATION_SCHEMA: `SELECT table_name, column_name, data_type FROM {PROJECT_ID}.learning_labs_mission_data.INFORMATION_SCHEMA.COLUMNS WHERE column_name LIKE '%search_term%'`.\n\n"
+        f"- DYNAMIC SCHEMA DISCOVERY: If unsure which table or column contains specific data, query BigQuery INFORMATION_SCHEMA: `SELECT table_name, column_name, data_type FROM {PROJECT_ID}.mission_data.INFORMATION_SCHEMA.COLUMNS WHERE column_name LIKE '%search_term%'`.\n\n"
         "2. UNSTRUCTURED DATASTORE (search_humint_reports Tool):\n"
         "- Search function for classified HUMINT PDF field intelligence reports with embedded tactical images, optical crops, radar reticles, and source reliability ratings.\n\n"
         "INTELLIGENCE SYNTHESIS RULES:\n"
@@ -615,7 +615,7 @@ def get_agent_instruction(context=None):
         "3. List your sources as numbered items matching your inline numbers.\n"
         "4. MANDATORY HYPERLINKING FOR HUMINT PDF REPORTS: Every HUMINT report listed under '### Sources' MUST be formatted as an explicit Markdown hyperlink `[Title](authenticated_url)` using the exact URL from the `link` or `formatted_citation` field from `search_humint_reports`.\n"
         "   Example format in Sources:\n"
-        "   1. [HUMINT Report HUM-445: Coastal Estuary Covert Loading Operations](https://storage.cloud.google.com/antig-dave-learning-labs-humint-docs/HUM-445_TGT-ALPHA-7.pdf#page=1)\n"
+        "   1. [HUMINT Report HUM-445: Coastal Estuary Covert Loading Operations](https://storage.cloud.google.com/antig-dave-humint-docs/HUM-445_TGT-ALPHA-7.pdf#page=1)\n"
         "5. STRICT PROHIBITION ON HYPERLINKING BIGQUERY DATA: Do NOT hyperlink BigQuery table names, SQL queries, or structured records. List BigQuery sources as plain text (e.g., `2. BigQuery Dataset: radar_telemetry (Track TRK-901)`).\n"
         "6. Do NOT include links to BigQuery Studio or raw gs:// URIs.\n"
         "7. Whenever asked about HUMINT field reports, PDF links, or unstructured data, you MUST call the `search_humint_reports` tool to retrieve official PDF document links. Do NOT claim or state that datastores are unauthenticated or offline.\n"
