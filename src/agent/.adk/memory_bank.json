@@ -1,0 +1,17 @@
+{
+  "intelligence_analysts": {
+    "group_id": "intelligence_analysts",
+    "group_name": "UK Joint Command Intelligence Analysts",
+    "primary_threat_domains": [
+      "EW",
+      "AIR_DEFENSE"
+    ],
+    "default_classification": "UK EYES ONLY",
+    "preferred_coordinates": "MGRS",
+    "active_watchlist_targets": [
+      "TEL-ALPHA-7",
+      "RADAR-BRAVO-3"
+    ],
+    "last_updated": 1790875677.626749
+  }
+}

@@ -4,9 +4,9 @@ Welcome to the **Agentic AI Mission Intelligence Reference Architecture**. This 
 
 ### 📚 Executive Briefing
 Are you a CTO, Senior Operations Manager, or Technical Leader looking to understand the strategic value and architectural principles behind this architecture? 
-👉 **Read the [Executive Briefing: Architecting Enterprise Agentic AI](EXECUTIVE_BRIEFING.md)**
+👉 **Read the [Executive Briefing: Architecting Enterprise Agentic AI](docs/EXECUTIVE_BRIEFING.md)**
 
-**Strategic Context:** In alignment with the project [Scoping Document](scoping_document.md) and [Implementation Specification](Spec.md), this reference architecture illustrates how to synthesize structured telemetry and unstructured HUMINT field reports to accelerate Command and Control (C2) decision advantage. While this implementation utilizes Google Cloud services, the architecture translates directly to secure enterprise cloud deployments, adhering strictly to **NATO-first** integration and intelligence-sharing doctrine.  
+**Strategic Context:** In alignment with the project [Scoping Document](docs/scoping_document.md) and [Implementation Specification](docs/Spec.md), this reference architecture illustrates how to synthesize structured telemetry and unstructured HUMINT field reports to accelerate Command and Control (C2) decision advantage. While this implementation utilizes Google Cloud services, the architecture translates directly to secure enterprise cloud deployments, adhering strictly to **NATO-first** integration and intelligence-sharing doctrine.  
 **Security Classification:** Demonstrator  
 
 ---
@@ -15,10 +15,10 @@ Are you a CTO, Senior Operations Manager, or Technical Leader looking to underst
 
 For an in-depth breakdown of the software design patterns and cloud infrastructure, refer to the dedicated architecture documents:
 
-*   **[System Architecture](Architecture.md)**: Master TOGAF / WAF system architecture document bridging data, cognitive runtime, MCP, resilience, OPSEC, and coalition federation.
-*   **[Security Architecture](Security.md)**: Details the secure cloud topology, including Model Armor OPSEC intercepts, Human-in-the-Loop (HITL) gateways, Agent Gateway, and Context Caching.
-*   **[Observability Architecture](Observability.md)**: Details OpenTelemetry instrumentation and Cloud Monitoring dashboards.
-*   **[Instructor Storyboard & Playbook](STORYBOARD.md)**: Executive delivery narrative, customer milestones, architectural WAF concepts, and instructor teaching notes.
+*   **[System Architecture](docs/Architecture.md)**: Master TOGAF / WAF system architecture document bridging data, cognitive runtime, MCP, resilience, OPSEC, and coalition federation.
+*   **[Security Architecture](docs/Security.md)**: Details the secure cloud topology, including Model Armor OPSEC intercepts, Human-in-the-Loop (HITL) gateways, Agent Gateway, and Context Caching.
+*   **[Observability Architecture](docs/Observability.md)**: Details OpenTelemetry instrumentation and Cloud Monitoring dashboards.
+*   **[Instructor Storyboard & Playbook](docs/STORYBOARD.md)**: Executive delivery narrative, customer milestones, architectural WAF concepts, and instructor teaching notes.
 
 ### High-Level Flow Overview
 
@@ -89,8 +89,8 @@ The mission intelligence agent implements core enterprise architecture patterns 
    * Enforces UK MOD Joint Command doctrine: AI recommends, but only human command staff may authorize.
    * High-consequence kinetic strike advisories and offensive cyber countermeasures are automatically held pending submission of an operational confirmation token (`AUTH_<HASH>`).
 4. **Enterprise Grounding with Page-Level PDF Citations**:
-   * Discovery Engine `contentSearchSpec` parses `derivedStructData.extractive_segments` to extract page numbers and snippets.
-   * Yields grounded, verifiable Markdown links (`[HUM-448, Page 2: Target Delta-9](gs://...#page=2)`).
+   * Discovery Engine `contentSearchSpec` parses `derivedStructData.extractive_segments` to extract page numbers and snippets, adhering to ADK guardrails by omitting backend summaries (`summarySpec`).
+   * Yields grounded, verifiable Markdown links (`[HUM-448, Page 2: Target Delta-9](https://storage.cloud.google.com/...#page=2)`) rendering interactive source chips in the Gemini Enterprise UI.
 5. **Tier 1 Fast-Path Intercepts (`fast_path_intercept`)**:
    * Intercepts conversational greetings and status queries locally in `< 50ms`, resolving with **0 LLM token cost**.
 6. **Model Right-Sizing (`gemini-3.8-flash` & `gemini-3.1-pro`)**:
@@ -134,7 +134,7 @@ python3 -m unittest discover -s src/tests -p "test_*.py" -v
 
 These prompts can be tested locally (`python3 src/agent/agent.py "<PROMPT>"`) or in the **Gemini Enterprise Chat UI**:
 
-👉 **See the full [Test Suite Prompts](Test_Suite_Prompts.md) document.**
+👉 **See the full [Test Suite Prompts](docs/Test_Suite_Prompts.md) document.**
 
 ---
 

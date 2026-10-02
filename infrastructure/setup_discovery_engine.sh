@@ -40,17 +40,15 @@ echo "======================================================================"
 # 1. Verify / Generate PDF Documents
 echo ""
 echo "📌 [1/6] Verifying 15 Multimodal HUMINT PDF Intelligence Reports (including 5 Security Breaches)..."
-if [ ! -f "./documents/HUM-455_TGT-KILO-3.pdf" ]; then
-    python3 ./scripts/generate_humint_pdfs.py
-fi
+# Generating omitted, using existing data from ../data/unstructured_humint/
 
 # 2. Upload PDFs & JSONL Metadata to GCS Bucket
 echo ""
 echo "📌 [2/6] Syncing PDF Documents & JSONL Metadata to Cloud Storage ($BUCKET_NAME)..."
-python3 ./scripts/generate_documents_jsonl.py
+# JSONL generation omitted, using existing data
 gcloud storage buckets create "$BUCKET_NAME" --project="$PROJECT_ID" --location="$LOCATION" 2>/dev/null || gsutil mb -p "$PROJECT_ID" -l "$LOCATION" "$BUCKET_NAME" 2>/dev/null || true
-gcloud storage cp ./documents/*.pdf "$BUCKET_NAME/" 2>/dev/null || gsutil -m cp ./documents/*.pdf "$BUCKET_NAME/" 2>/dev/null || true
-gcloud storage cp ./documents/documents.jsonl "$BUCKET_NAME/documents.jsonl" 2>/dev/null || gsutil cp ./documents/documents.jsonl "$BUCKET_NAME/documents.jsonl" 2>/dev/null || true
+gcloud storage cp ../data/unstructured_humint/*.pdf "$BUCKET_NAME/" 2>/dev/null || gsutil -m cp ../data/unstructured_humint/*.pdf "$BUCKET_NAME/" 2>/dev/null || true
+gcloud storage cp ../data/unstructured_humint/documents.jsonl "$BUCKET_NAME/documents.jsonl" 2>/dev/null || gsutil cp ../data/unstructured_humint/documents.jsonl "$BUCKET_NAME/documents.jsonl" 2>/dev/null || true
 echo "✅ PDF documents & JSONL metadata uploaded to $BUCKET_NAME"
 
 # 3. Create Discovery Engine Unstructured Datastore & Link to Gemini Enterprise App

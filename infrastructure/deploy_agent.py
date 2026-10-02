@@ -158,7 +158,7 @@ def deploy_reasoning_engine(project_id: str, location: str) -> str:
     os.environ["ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS"] = "true"
 
     code_dir = os.path.dirname(os.path.abspath(__file__))
-    agent_dir = os.path.join(code_dir, "my_agent")
+    agent_dir = os.path.join(code_dir, "../src/agent")
 
     cmd = [
         "adk", "deploy", "agent_engine", agent_dir,
@@ -298,12 +298,13 @@ def deploy_dashboards(project_id: str) -> dict:
     code_dir = os.path.dirname(os.path.abspath(__file__))
     dash_files = [
         ("dashboard_observability.json", "UK Mission Intel Agent - Observability & OpenTelemetry Metrics", "observability"),
-        ("dashboard_model_armor.json", "UK Mission Intel Agent - Model Armor & OPSEC Compliance Metrics", "model_armor")
+        ("dashboard_model_armor.json", "UK Mission Intel Agent - Model Armor & OPSEC Compliance Metrics", "model_armor"),
+        ("dashboard_finops.json", "UK Mission Intel Agent - FinOps Token Burn", "finops")
     ]
     deployed_ids = {}
 
     for json_name, expected_title, key in dash_files:
-        json_path = os.path.join(code_dir, json_name)
+        json_path = os.path.join(code_dir, "dashboards", json_name)
         if not os.path.exists(json_path):
             print(f"   ⚠️ Config file not found: {json_path}")
             continue
@@ -375,6 +376,41 @@ def ensure_spiffe_iam_bindings(project_id: str, re_id: str):
         print("✅ SPIFFE IAM Policy Bindings enforced successfully.")
     except Exception as e:
         print(f"⚠️ Notice enforcing SPIFFE IAM bindings: {e}")
+
+def deploy_infrastructure_security(project_id: str):
+    print("\n📌 [5.5/6] Deploying Agent Gateway and Security Policies...")
+    code_dir = os.path.dirname(os.path.abspath(__file__))
+    security_dir = os.path.join(code_dir, "security")
+    location = "us-central1"
+
+    # Cleanup old resources
+    print("   🧹 Cleaning up legacy gateways and policies (ignoring errors if not found)...")
+    subprocess.run(["gcloud", "network-security", "authz-policies", "delete", "a2a-ingress-uap-policy", f"--location={location}", f"--project={project_id}", "--quiet"], capture_output=True)
+    subprocess.run(["gcloud", "network-security", "authz-policies", "delete", "a2a-coalition-ingress-gateway-aisecurity-authzpolicy", f"--location={location}", f"--project={project_id}", "--quiet"], capture_output=True)
+    subprocess.run(["gcloud", "beta", "service-extensions", "authz-extensions", "delete", "a2a-coalition-ingress-gateway-aisecurity-authzextension", f"--location={location}", f"--project={project_id}", "--quiet"], capture_output=True)
+    subprocess.run(["gcloud", "network-services", "agent-gateways", "delete", "a2a-coalition-ingress-gateway", f"--location={location}", f"--project={project_id}", "--quiet"], capture_output=True)
+
+    # Import new resources
+    print("   🚀 Deploying new Agent Gateway and Security Policies...")
+    
+    gw_file = os.path.join(security_dir, "platform_ingress_agent_gateway.yaml")
+    ext_file = os.path.join(security_dir, "platform_ingress_authz_extension.yaml")
+    armor_pol_file = os.path.join(security_dir, "platform_ingress_model_armor_policy.yaml")
+    uap_pol_file = os.path.join(security_dir, "platform_ingress_uap_policy.yaml")
+
+    cmds = [
+        ["gcloud", "network-services", "agent-gateways", "import", "mission-intel-ingress-gateway", f"--source={gw_file}", f"--location={location}", f"--project={project_id}"],
+        ["gcloud", "beta", "service-extensions", "authz-extensions", "import", "mission-intel-ingress-gateway-aisecurity-authzextension", f"--source={ext_file}", f"--location={location}", f"--project={project_id}"],
+        ["gcloud", "network-security", "authz-policies", "import", "mission-intel-ingress-gateway-aisecurity-authzpolicy", f"--source={armor_pol_file}", f"--location={location}", f"--project={project_id}"],
+        ["gcloud", "network-security", "authz-policies", "import", "mission-intel-ingress-uap-policy", f"--source={uap_pol_file}", f"--location={location}", f"--project={project_id}"]
+    ]
+
+    for cmd in cmds:
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        if res.returncode == 0:
+            print(f"      ✅ Successfully imported {cmd[4]}")
+        else:
+            print(f"      ❌ Error importing {cmd[4]}: {res.stderr.strip()}")
 
 def run_agent_test_validation(project_id: str, location: str, re_id: str, mode: str):
     if mode == "none":
@@ -493,6 +529,7 @@ def main():
     parser.add_argument("--project", default=get_default_project(), help="GCP Project ID")
     parser.add_argument("--location", default="us-central1", help="GCP Region")
     parser.add_argument("--skip-agent-deploy", action="store_true", help="Skip ADK deploy step and prune/update dashboards/run tests only")
+    parser.add_argument("--no-prune", action="store_true", help="Do not prune stale Reasoning Engine instances")
     parser.add_argument("--test", choices=["quick", "medium", "demo", "none"], default="quick", help="Test mode to execute after deployment (default: quick)")
     args = parser.parse_args()
 
@@ -525,10 +562,16 @@ def main():
     ensure_spiffe_iam_bindings(args.project, re_id)
 
     # 4. Prune stale instances
-    prune_stale_reasoning_engines(args.project, args.location, re_id)
+    if not args.no_prune:
+        prune_stale_reasoning_engines(args.project, args.location, re_id)
+    else:
+        print("\n📌 [3/6] Skipping pruning of stale Reasoning Engine instances (--no-prune).")
 
     # 5. Sync Agent Registry & Gemini Enterprise
     update_agent_registry_and_gemini(args.project, args.location, re_id)
+
+    # 5.5 Deploy Agent Gateway and Security Policies
+    deploy_infrastructure_security(args.project)
 
     # 6. Deploy Dashboards
     deployed_dashboards = deploy_dashboards(args.project)
@@ -539,6 +582,7 @@ def main():
     # 7. Print Direct Telemetry Links
     obs_id = deployed_dashboards.get("observability", "0d17a8ad-47de-4956-96b3-073f73eb057b")
     ma_id = deployed_dashboards.get("model_armor", "34ae482f-9a69-4ec2-a890-9702d24ed2bc")
+    finops_id = deployed_dashboards.get("finops", "unknown")
 
     print("\n======================================================================")
     print("🎉 DEPLOYMENT & VALIDATION LIFECYCLE COMPLETE")
@@ -546,6 +590,7 @@ def main():
     print(f"Active Reasoning Engine : {re_id}")
     print(f"Observability Dashboard : https://console.cloud.google.com/monitoring/dashboards/builder/{obs_id}?project={args.project}")
     print(f"Model Armor Dashboard   : https://console.cloud.google.com/monitoring/dashboards/builder/{ma_id}?project={args.project}")
+    print(f"FinOps Dashboard        : https://console.cloud.google.com/monitoring/dashboards/builder/{finops_id}?project={args.project}")
     print(f"Cloud Trace Explorer    : https://console.cloud.google.com/traces/explorer?project={args.project}")
     print(f"Cloud Logging Explorer  : https://console.cloud.google.com/logs/query;query=resource.type%3D%22aiplatform.googleapis.com%2FReasoningEngine%22?project={args.project}")
     print("======================================================================")

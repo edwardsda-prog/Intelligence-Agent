@@ -19,6 +19,9 @@ Every LLM call and tool span emits standard OpenTelemetry attributes such as `ge
 All metrics are exported to Google Cloud Logging and aggregated into two core Cloud Monitoring Dashboards:
 1. **Observability Dashboard**: Tracks Agent Execution Latency (via Spans), GenAI Token Usage, Tool Execution Latency (segmented by BigQuery MCP & Discovery Engine), and Session Turn Counts.
 2. **Model Armor & OPSEC Compliance Dashboard**: Tracks MGRS Coordinate Redaction Events, Model Armor Intercept Latency, HITL Guardrail Gate Triggers, and NATO Classification Label Compliance.
+   - The `apply_model_armor` callback natively emits OpenTelemetry spans and structured logging metric payloads containing `redacted`, `mgrs_count`, and `latency_ms` to populate these metrics.
+
+To facilitate telemetry ingestion and SRE validation, a batch testing script (`prepopulate_dashboards.py`) is used to autonomously feed synthetic queries against the active endpoint and populate the dashboards with live Cloud Logging traces.
 
 For ad-hoc SRE operations, **BigQuery Log Analytics** enables SQL aggregations over the `_AllLogs` table to audit state delta trajectories and token costs per user.
 

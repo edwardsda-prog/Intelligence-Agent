@@ -25,7 +25,7 @@ The platform supports multi-national coalition scenarios (e.g. federating a UK H
 
 ## IAM & MCP Governance
 Authentication and Authorization are grounded in Agent Identities and Unified Access Policies (UAP).
-- **Agent Identities (SPIFFE)**: Reasoning Engine instances are assigned unique cryptographic identities (SVIDs). Access tokens are bound to the agent's private key using **DPoP** (Demonstrating Proof-of-Possession), nullifying token theft replay attacks.
+- **Agent Identities (SPIFFE & mTLS)**: Reasoning Engine instances are assigned unique cryptographic identities (SVIDs). The agent leverages native SDK clients (e.g., `google-cloud-discoveryengine`) to automatically perform mTLS certificate exchange and bind the Agent's identity via Workload Identity for secure backend RAG querying. Access tokens are bound to the agent's private key using **DPoP** (Demonstrating Proof-of-Possession), nullifying token theft replay attacks.
 - **Dual-Layer IAM Security for MCP**: Managed Model Context Protocol servers are protected by two gates:
   1. **The MCP Gate**: Principal must hold the `roles/mcp.toolUser` role.
   2. **The Service Gate**: Principal must hold the underlying GCP service role (e.g. `roles/bigquery.dataViewer`).

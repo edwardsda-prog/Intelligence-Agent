@@ -83,5 +83,6 @@ ADK provides zero-logic-change portability across runtimes. This project standar
 
 ## Enterprise Grounding
 The RAG pipeline is powered by Vertex AI Search / Discovery Engine acting as an unstructured datastore for operational HUMINT PDFs.
-- Extractive segments are enabled in the backend datastore settings, returning precise, verifiable sentence-level snippets from the original reports.
-- Grounding citations are formatted to include document page anchors (e.g., `#page=N`) ensuring that generated responses inside the Gemini Enterprise Chat UI render clickable source attribution links for verification.
+- **SPIFFE Workload Identity Resolution**: The Agent Platform securely authenticates to Discovery Engine via the native SDK, which automatically handles mTLS certificate exchange and correctly binds the Agent's identity via Workload Identity (SVIDs), replacing manual REST auth.
+- **Extractive Segments**: Extractive segments are enabled in the backend datastore settings, returning precise, verifiable sentence-level snippets from the original reports (omitting duplicate backend LLM summaries for ADK performance compliance).
+- **Native Gemini Citations**: Grounding citations are formatted to output direct authenticated object URIs (`https://storage.cloud.google.com/bucket/file`) and include document page anchors (e.g., `#page=N`), ensuring that generated responses inside the Gemini Enterprise Chat UI natively render interactive, clickable source chips for verification.

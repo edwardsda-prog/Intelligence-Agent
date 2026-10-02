@@ -1,0 +1,50 @@
+{
+  "displayName": "UK Mission Intel Agent - FinOps Token Burn",
+  "mosaicLayout": {
+    "columns": 12,
+    "tiles": [
+      {
+        "xPos": 0,
+        "yPos": 0,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Token Burn: Input vs Output",
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "resource.type=\"aiplatform.googleapis.com/ReasoningEngine\" metric.type=\"logging.googleapis.com/user/genai_token_usage\""
+                  }
+                },
+                "plotType": "LINE"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 6,
+        "yPos": 0,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Agent Turn/Recursion Activity",
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "resource.type=\"aiplatform.googleapis.com/ReasoningEngine\" metric.type=\"logging.googleapis.com/user/session_turn_count\""
+                  }
+                },
+                "plotType": "STACKED_BAR"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

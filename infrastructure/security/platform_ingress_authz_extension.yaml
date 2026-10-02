@@ -1,4 +1,4 @@
-name: projects/antig-dave/locations/us-central1/authzExtensions/a2a-coalition-ingress-gateway-aisecurity-authzextension
+name: projects/antig-dave/locations/us-central1/authzExtensions/mission-intel-ingress-gateway-aisecurity-authzextension
 service: modelarmor.us-central1.rep.googleapis.com
 failOpen: false
 timeout: 10s

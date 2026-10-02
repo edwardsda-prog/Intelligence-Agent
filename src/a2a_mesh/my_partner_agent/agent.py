@@ -7,7 +7,7 @@ from google.oauth2.credentials import Credentials
 from google.adk.agents import Agent
 from google.adk.models.google_llm import Gemini
 
-REASONING_ENGINE_ID = "1626863242980622336"
+REASONING_ENGINE_ID = "2807070228142358528"
 PROJECT_ID = os.environ.get("PROJECT_ID", "284046449012")
 LOCATION = os.environ.get("LOCATION", "us-central1")
 MODEL_NAME = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
@@ -69,17 +69,42 @@ def query_learning_lab_agent_via_a2a(prompt: str) -> str:
                 "Content-Type": "application/json"
             }
             body = {
+                "class_method": "stream_query",
                 "input": {
-                    "prompt": f"A2A_QUERY: {a2a_request_payload}"
+                    "message": f"A2A_QUERY: {a2a_request_payload}",
+                    "user_id": "nato-partner-agent"
                 }
             }
             response = requests.post(url, headers=headers, json=body, timeout=30)
             if response.status_code == 200:
                 print(f"\n📥 [A2A HTTPS Response via Agent Gateway / Reasoning Engine]:")
-                res_text = response.text
-                print(res_text[:500] + ("..." if len(res_text) > 500 else ""))
+                
+                # Try to parse the SSE stream from Reasoning Engine
+                full_text = ""
+                for line in response.text.splitlines():
+                    if line.startswith("data: "):
+                        try:
+                            chunk = json.loads(line[6:])
+                            if "content" in chunk and "parts" in chunk["content"]:
+                                for part in chunk["content"]["parts"]:
+                                    if "text" in part:
+                                        full_text += part["text"]
+                        except json.JSONDecodeError:
+                            pass
+                
+                if not full_text:
+                     full_text = response.text
+                     
+                print(full_text[:500] + ("..." if len(full_text) > 500 else ""))
                 print("----------------------------------------------------------------------\n")
-                return res_text
+                
+                # Attempt to parse as JSON-RPC, otherwise return raw text
+                try:
+                    data = json.loads(full_text)
+                    return data.get("result", {}).get("response", full_text)
+                except json.JSONDecodeError:
+                    # Deployed agent might not return JSON-RPC format, so just return raw text
+                    return full_text
             else:
                 print(f"⚠️ Remote A2A call failed with HTTP {response.status_code}: {response.text}. Falling back to local handler.")
         except Exception as e:

@@ -21,8 +21,8 @@ echo "======================================================================"
 # 1. Provision BigQuery Dataset
 echo ""
 echo "📌 [1/2] Provisioning BigQuery Dataset (mission_data)..."
-bq query --location=$LOCATION --use_legacy_sql=false --project_id="$PROJECT_ID" < ./setup_dataset.sql
-bq query --location=$LOCATION --use_legacy_sql=false --project_id="$PROJECT_ID" < ./setup_golden_dataset.sql
+bq query --location=$LOCATION --use_legacy_sql=false --project_id="$PROJECT_ID" < ./schemas/setup_dataset.sql
+bq query --location=$LOCATION --use_legacy_sql=false --project_id="$PROJECT_ID" < ../data/structured_sql/setup_golden_dataset.sql
 
 # Polling for BigQuery dataset readiness
 echo "⏳ Polling BigQuery dataset mission_data for READY status..."
@@ -42,8 +42,6 @@ done
 echo ""
 echo "📌 [2/2] Generating 15 Multimodal HUMINT PDF Reports & Syncing to GCS..."
 pip install --quiet reportlab --break-system-packages || pip install --quiet --user reportlab
-python3 # Generate PDFs omitted from deploy script, use synthetic data
-python3 # jsonl omitted
 
 if ! gcloud storage buckets describe "$BUCKET_NAME" --project="$PROJECT_ID" >/dev/null 2>&1; then
     gcloud storage buckets create "$BUCKET_NAME" --project="$PROJECT_ID" --location="$LOCATION"
