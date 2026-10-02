@@ -16,12 +16,13 @@ Every LLM call and tool span emits standard OpenTelemetry attributes such as `ge
   - `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS="true"`
 
 ## Dashboards & Logging
-All metrics are exported to Google Cloud Logging and aggregated into two core Cloud Monitoring Dashboards:
-1. **Observability Dashboard**: Tracks Agent Execution Latency (via Spans), GenAI Token Usage, Tool Execution Latency (segmented by BigQuery MCP & Discovery Engine), and Session Turn Counts.
+All metrics are exported to Google Cloud Logging and aggregated into core Cloud Monitoring Dashboards:
+1. **Observability Dashboard**: Tracks Agent Execution Latency (via Spans), GenAI Token Usage, Tool Execution Latency (segmented by BigQuery MCP & Discovery Engine), and Session Turn Counts. SPIFFE API Calls are also monitored here.
 2. **Model Armor & OPSEC Compliance Dashboard**: Tracks MGRS Coordinate Redaction Events, Model Armor Intercept Latency, HITL Guardrail Gate Triggers, and NATO Classification Label Compliance.
    - The `apply_model_armor` callback natively emits OpenTelemetry spans and structured logging metric payloads containing `redacted`, `mgrs_count`, and `latency_ms` to populate these metrics.
+3. **FinOps Dashboards & Alert Policies**: Implement FinOps alert policies based on token burn dashboard data, metering and alerting at the per-session and per-turn level.
 
-To facilitate telemetry ingestion and SRE validation, a batch testing script (`prepopulate_dashboards.py`) is used to autonomously feed synthetic queries against the active endpoint and populate the dashboards with live Cloud Logging traces.
+To facilitate telemetry ingestion and SRE validation, batch testing scripts (`prepopulate_scenario1_intro.py`, `prepopulate_scenario2_ops.py`, `prepopulate_scenario3_security.py`) are used to autonomously feed synthetic queries against the active endpoint and populate the dashboards with live Cloud Logging traces.
 
 For ad-hoc SRE operations, **BigQuery Log Analytics** enables SQL aggregations over the `_AllLogs` table to audit state delta trajectories and token costs per user.
 

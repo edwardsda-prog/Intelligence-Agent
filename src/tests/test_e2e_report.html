@@ -23,14 +23,14 @@
 </head>
 <body>
   <h1>🛡️ Mission Intel Automated Test Report</h1>
-  <div class="meta">Generated: 2026-10-01 16:38:59Z | Mode: <code>MOCK</code> | Commit: <code>504f9a2</code> | Project: <code>mission-intel-project</code> | Region: <code>us-central1</code></div>
+  <div class="meta">Generated: 2026-10-02 15:15:44Z | Mode: <code>MOCK</code> | Commit: <code>11611d6</code> | Project: <code>mission-intel-project</code> | Region: <code>us-central1</code></div>
   
   <div class="stats-card">
     <div class="stat-item"><span class="stat-val">100.0%</span><span class="stat-lbl">Pass Rate</span></div>
     <div class="stat-item"><span class="stat-val" style="color:#202124;">35</span><span class="stat-lbl">Total Tests</span></div>
     <div class="stat-item"><span class="stat-val">35</span><span class="stat-lbl">Passed</span></div>
     <div class="stat-item"><span class="stat-val" style="color: #5f6368">0</span><span class="stat-lbl">Failed</span></div>
-    <div class="stat-item"><span class="stat-val" style="color:#1a73e8;">1.24s</span><span class="stat-lbl">Execution Duration</span></div>
+    <div class="stat-item"><span class="stat-val" style="color:#1a73e8;">1.77s</span><span class="stat-lbl">Execution Duration</span></div>
   </div>
 
   <table>
@@ -62,7 +62,7 @@
               <td><code>UT-HITL-02</code></td>
               <td><strong>HITL Kinetic Command Hold Gate</strong></td>
               <td>Unit Test</td>
-              <td>72.1ms</td>
+              <td>127.5ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Autonomous kinetic strike authorization prohibited; secure hold enforced</td>
             </tr>
@@ -72,7 +72,7 @@
               <td><code>UT-HITL-03</code></td>
               <td><strong>HITL Cryptographic Release Token</strong></td>
               <td>Unit Test</td>
-              <td>0.0ms</td>
+              <td>0.1ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Valid AUTH_<HASH> token successfully clears gate and releases command advisory</td>
             </tr>
@@ -82,7 +82,7 @@
               <td><code>UT-HITL-04</code></td>
               <td><strong>HITL Offensive Cyber Gate</strong></td>
               <td>Unit Test</td>
-              <td>0.2ms</td>
+              <td>0.3ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Enforcing human watch-officer approval on high-consequence offensive cyber actions</td>
             </tr>
@@ -92,7 +92,7 @@
               <td><code>UT-CACHE-01</code></td>
               <td><strong>Context Caching Token Threshold (>32k)</strong></td>
               <td>Unit Test</td>
-              <td>0.5ms</td>
+              <td>0.6ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Verifying schemas and dossiers exceed Vertex AI 32,768 token threshold for 75-90% discount</td>
             </tr>
@@ -102,7 +102,7 @@
               <td><code>UT-CACHE-02</code></td>
               <td><strong>Context Caching Graceful Fallback</strong></td>
               <td>Unit Test</td>
-              <td>0.0ms</td>
+              <td>0.1ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Graceful fallback when project ID is unset or caching API is unavailable</td>
             </tr>
@@ -112,7 +112,7 @@
               <td><code>UT-CACHE-03</code></td>
               <td><strong>Context Caching Global Endpoint Routing</strong></td>
               <td>Unit Test</td>
-              <td>2.7ms</td>
+              <td>3.0ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Ensuring Gemini 3.8 Flash routes CachedContent creation to Vertex AI global endpoint</td>
             </tr>
@@ -132,7 +132,7 @@
               <td><code>UT-RESIL-01</code></td>
               <td><strong>Exponential Backoff & Jitter</strong></td>
               <td>Unit Test</td>
-              <td>10.8ms</td>
+              <td>14.5ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Automatic recovery from transient tool failures via exponential backoff</td>
             </tr>
@@ -142,7 +142,7 @@
               <td><code>UT-TELEM-01</code></td>
               <td><strong>Telemetry Spec: OpenTelemetry & Content Config</strong></td>
               <td>Unit Test</td>
-              <td>0.3ms</td>
+              <td>0.4ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Reasoning Engine spec activates both OpenTelemetry metrics/traces and prompt/response logging</td>
             </tr>
@@ -152,7 +152,7 @@
               <td><code>UT-TELEM-02</code></td>
               <td><strong>Prompt/Response Logging: Prevention of ADK Fallback</strong></td>
               <td>Unit Test</td>
-              <td>1.8ms</td>
+              <td>1.4ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Preventing ADK CLI deploy from silently defaulting ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS to false</td>
             </tr>
@@ -162,7 +162,7 @@
               <td><code>UT-TELEM-03</code></td>
               <td><strong>Telemetry Context: GenAI Event Content Capturing</strong></td>
               <td>Unit Test</td>
-              <td>1047.4ms</td>
+              <td>1478.6ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Ensuring ADK telemetry context resolution properly maps to ContentCapturingMode.EVENT_ONLY</td>
             </tr>
@@ -172,7 +172,7 @@
               <td><code>UT-TELEM-04</code></td>
               <td><strong>Log Analysis: OpenTelemetry Traces & Metrics</strong></td>
               <td>Unit Test</td>
-              <td>2.2ms</td>
+              <td>6.7ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Verifying log analyzer validates OpenTelemetry traces, spans, and GenAI metric conventions in Cloud Logging</td>
             </tr>
@@ -202,7 +202,7 @@
               <td><code>S1-Q1</code></td>
               <td><strong>Radar & EW Sensor Fusion</strong></td>
               <td>SQL Query</td>
-              <td>1.5ms</td>
+              <td>1.1ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Multi-sensor spatial and bearing correlation across distinct schemas</td>
             </tr>
@@ -212,7 +212,7 @@
               <td><code>S1-Q2</code></td>
               <td><strong>Cyber-Kinetic Convergence</strong></td>
               <td>SQL Query</td>
-              <td>0.8ms</td>
+              <td>2.3ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Correlating cyber threat actor with physical radar ingress</td>
             </tr>
@@ -232,7 +232,7 @@
               <td><code>S1-Q4</code></td>
               <td><strong>Unified Multi-Domain COP Dossier</strong></td>
               <td>SQL Query</td>
-              <td>1.3ms</td>
+              <td>1.2ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Querying pre-aggregated view contracts for sub-second decision making</td>
             </tr>
@@ -242,7 +242,7 @@
               <td><code>S2-P1</code></td>
               <td><strong>ReAct Multi-Hop Correlation</strong></td>
               <td>Student Prompt</td>
-              <td>0.8ms</td>
+              <td>0.7ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Observing autonomous ReAct Thought -> Action -> Observation loop</td>
             </tr>
@@ -272,7 +272,7 @@
               <td><code>S3-P1</code></td>
               <td><strong>Decoupled MCP Tool Execution</strong></td>
               <td>Student Prompt</td>
-              <td>0.9ms</td>
+              <td>0.7ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Tool execution sandboxing via Model Context Protocol on Cloud Run without embedded credentials</td>
             </tr>
@@ -282,7 +282,7 @@
               <td><code>S3-P2</code></td>
               <td><strong>OpenTelemetry & Prompt/Response Log Content Auditing</strong></td>
               <td>Student Prompt</td>
-              <td>0.1ms</td>
+              <td>0.0ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Log analysis confirming OpenTelemetry traces/metrics and un-elided prompt/response message logging</td>
             </tr>
@@ -312,7 +312,7 @@
               <td><code>S4-P3</code></td>
               <td><strong>Human-in-the-Loop Kinetic Gate</strong></td>
               <td>Student Prompt</td>
-              <td>0.3ms</td>
+              <td>0.2ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Enforcing UK MOD Joint Command doctrine: AI cannot autonomously authorize kinetic actions</td>
             </tr>
@@ -332,7 +332,7 @@
               <td><code>S5-P3</code></td>
               <td><strong>Hybrid Multimodal Synthesis</strong></td>
               <td>Student Prompt</td>
-              <td>0.9ms</td>
+              <td>1.1ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Synthesizing structured SQL with unstructured vector search under dual circuit breakers</td>
             </tr>
@@ -352,7 +352,7 @@
               <td><code>S6-P2</code></td>
               <td><strong>Quantitative Numerical Precision</strong></td>
               <td>Student Prompt</td>
-              <td>0.7ms</td>
+              <td>0.6ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Validating numerical fidelity against golden ground-truth references</td>
             </tr>

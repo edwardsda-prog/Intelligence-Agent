@@ -6,11 +6,12 @@ The platform enforces a zero-trust, defense-in-depth security posture utilizing 
 - **Outbound Response Template** (`mission_intel_response_armor`): Applies Cloud DLP Inspection and De-identification templates to intercept sensitive operational intelligence.
   - Custom regex templates flag standard PII alongside 10-digit Military Grid Reference System (MGRS) coordinates, UK/NATO national caveats (`UK EYES ONLY`), and tactical call signs (`SABRE-01`).
   - Flagged entities are deterministically redacted and replaced with tokenized InfoTypes such as `[CUSTOM_MGRS_COORDINATES]`.
+  - **MGRS Redaction Bypass**: MGRS coordinate redaction is bypassed if accessed via Gemini Enterprise (`identity_type == "AGENT_IDENTITY"`), but PII redaction is always enforced.
 
 ## Zero-Trust Security & DevSecOps
 The deployment assumes that even the reasoning model may exhibit probabilistic failures.
 - **Machine-Speed Intercept**: Raw LLM output is intercepted before it reaches the UI. Model Armor's REST API (`sanitizeModelResponse`) scans and sanitizes the payload.
-- **Local DLP Regex Fallback**: If the Model Armor endpoint times out or trips the circuit breaker, a hermetic Python regex fallback catches and redacts MGRS coordinates to `[REDACTED_MGRS_COORDINATE]`, guaranteeing zero operational data exfiltration under degraded network conditions.
+- **Local DLP Regex Fallback**: If the Model Armor endpoint times out or trips the circuit breaker, a hermetic Python regex fallback catches and redacts MGRS coordinates (unless bypassed for AGENT_IDENTITY), guaranteeing zero operational data exfiltration under degraded network conditions.
 
 ## Human-in-the-Loop (HITL) Gateways
 Autonomous tool execution is prevented from undertaking high-risk kinetic or cyber operations.
