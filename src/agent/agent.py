@@ -384,6 +384,7 @@ def apply_model_armor(context, response):
             mgrs_count = len(mgrs_matches)
             sanitized_text = text
             redacted = False
+            identity_type = "STANDARD_OAUTH"
 
             try:
                 armor_location = os.environ.get("ARMOR_LOCATION", "us-central1")
@@ -393,7 +394,7 @@ def apply_model_armor(context, response):
                     "spiffe_id": spiffe_id,
                     "tool_name": "model_armor_sanitizer"
                 })
-                url = f"https://modelarmor.{armor_location}.rep.googleapis.com/v1/projects/{PROJECT_ID}/locations/{armor_location}/templates/mission_intel_armor:sanitizeModelResponse"
+                url = f"https://modelarmor.{armor_location}.rep.googleapis.com/v1/projects/{PROJECT_ID}/locations/{armor_location}/templates/mission_intel_response_armor:sanitizeModelResponse"
                 headers = {
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
@@ -420,12 +421,14 @@ def apply_model_armor(context, response):
                     armor_circuit_breaker.record_success()
                 else:
                     armor_circuit_breaker.record_failure()
-                    sanitized_text = re.sub(mgrs_pattern, '[REDACTED_MGRS]', text)
             except Exception as e:
                 armor_circuit_breaker.record_failure()
-                sanitized_text = re.sub(mgrs_pattern, '[REDACTED_MGRS]', text)
 
-            if sanitized_text != text or mgrs_count > 0 or '[REDACTED_MGRS]' in sanitized_text:
+            # MGRS redaction is bypassed if accessed via Gemini Enterprise (AGENT_IDENTITY)
+            if identity_type != "AGENT_IDENTITY":
+                sanitized_text = re.sub(mgrs_pattern, '[REDACTED_MGRS]', sanitized_text)
+                
+            if sanitized_text != text or '[REDACTED_MGRS]' in sanitized_text or (mgrs_count > 0 and identity_type != "AGENT_IDENTITY"):
                 redacted = True
 
             try:
