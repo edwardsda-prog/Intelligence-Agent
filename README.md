@@ -95,6 +95,9 @@ The mission intelligence agent implements core enterprise architecture patterns 
    * Intercepts conversational greetings and status queries locally in `< 50ms`, resolving with **0 LLM token cost**.
 6. **Model Right-Sizing (`gemini-3.8-flash` & `gemini-3.1-pro`)**:
    * Balances sub-second tool generation speed and tactical responsiveness (Flash) with complex multi-domain reasoning and strategic analysis (Pro).
+7. **FinOps Alert Policies (`infrastructure/finops/`)**:
+   * Monitors `session_turn_count` and `genai_token_usage` metrics at the per-session and fleet level.
+   * Protects the project from agentic cost runaway by alerting on excessive token burn (>250k tokens) or potential infinite ReAct loops (>15 turns per session).
 
 ---
 
