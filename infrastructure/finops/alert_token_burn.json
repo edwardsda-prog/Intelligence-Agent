@@ -1,0 +1,33 @@
+{
+  "displayName": "FinOps: High Token Burn Alert (>250k tokens / 10m)",
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "Token Burn exceeds 250k across project",
+      "conditionThreshold": {
+        "filter": "resource.type=\"aiplatform.googleapis.com/ReasoningEngine\" AND metric.type=\"logging.googleapis.com/user/genai_token_usage\"",
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 250000,
+        "duration": "0s",
+        "trigger": {
+          "count": 1
+        },
+        "aggregations": [
+          {
+            "alignmentPeriod": "600s",
+            "crossSeriesReducer": "REDUCE_SUM",
+            "perSeriesAligner": "ALIGN_SUM"
+          }
+        ]
+      }
+    }
+  ],
+  "documentation": {
+    "content": "## FinOps Alert: High GenAI Token Burn\nThe Reasoning Engine fleet has consumed over 250,000 tokens within the last 10 minutes.\n\nInvestigate the Observability Dashboard to identify the source of the traffic spike.",
+    "mimeType": "text/markdown"
+  },
+  "userLabels": {
+    "severity": "warning",
+    "category": "finops"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "displayName": "FinOps: Runaway Session Alert (>15 turns / 10m)",
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "Session turns exceed 15 in 10 minutes",
+      "conditionThreshold": {
+        "filter": "resource.type=\"aiplatform.googleapis.com/ReasoningEngine\" AND metric.type=\"logging.googleapis.com/user/session_turn_count\"",
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 15,
+        "duration": "0s",
+        "trigger": {
+          "count": 1
+        },
+        "aggregations": [
+          {
+            "alignmentPeriod": "600s",
+            "crossSeriesReducer": "REDUCE_SUM",
+            "perSeriesAligner": "ALIGN_SUM"
+          }
+        ]
+      }
+    }
+  ],
+  "documentation": {
+    "content": "## FinOps Alert: Runaway Session Detected\nA single Agent session has executed more than 15 turns within a 10-minute window.\n\nThis is highly indicative of an infinite ReAct loop or autonomous failure. Check the Observability Dashboard and Cloud Logging immediately to identify the failing `session.id`.",
+    "mimeType": "text/markdown"
+  },
+  "userLabels": {
+    "severity": "critical",
+    "category": "finops"
+  }
+}
