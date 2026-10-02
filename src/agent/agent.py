@@ -12,7 +12,6 @@ if REPO_ROOT not in sys.path:
 
 from common.resilience import CircuitBreaker, retry_with_backoff
 from common.hitl import evaluate_hitl_guardrail
-from common.caching import get_or_create_mission_cache
 import requests
 import google.auth
 import google.auth.transport.requests

@@ -16,13 +16,13 @@ Are you a CTO, Senior Operations Manager, or Technical Leader looking to underst
 For an in-depth breakdown of the software design patterns and cloud infrastructure, refer to the dedicated architecture documents:
 
 *   **[System Architecture](docs/Architecture.md)**: Master TOGAF / WAF system architecture document bridging data, cognitive runtime, MCP, resilience, OPSEC, and coalition federation.
-*   **[Security Architecture](docs/Security.md)**: Details the secure cloud topology, including Model Armor OPSEC intercepts, Human-in-the-Loop (HITL) gateways, Agent Gateway, and Context Caching.
+*   **[Security Architecture](docs/Security.md)**: Details the secure cloud topology, including Model Armor OPSEC intercepts, Human-in-the-Loop (HITL) gateways, and Agent Gateway.
 *   **[Observability Architecture](docs/Observability.md)**: Details OpenTelemetry instrumentation and Cloud Monitoring dashboards.
 *   **[Instructor Storyboard & Playbook](docs/STORYBOARD.md)**: Executive delivery narrative, customer milestones, architectural WAF concepts, and instructor teaching notes.
 
 ### High-Level Flow Overview
 
-The architecture integrates **BigQuery**, the **Model Context Protocol (MCP)**, **Agent Registry & Gateway**, **Vertex AI Agent Platform (Reasoning Engine)**, **Context Caching**, **Circuit Breakers**, **OpenTelemetry**, **Gemini Enterprise**, and **Model Armor**:
+The architecture integrates **BigQuery**, the **Model Context Protocol (MCP)**, **Agent Registry & Gateway**, **Vertex AI Agent Platform (Reasoning Engine)**, **Circuit Breakers**, **OpenTelemetry**, **Gemini Enterprise**, and **Model Armor**:
 
 ```mermaid
 flowchart TD
@@ -41,7 +41,6 @@ flowchart TD
     subgraph Runtime["3. Agent Platform & Reasoning Engine"]
         ADK[ADK Mission Intel Agent]
         RE[Vertex AI Reasoning Engine]
-        CC[Vertex AI Context Cache\n>32k Tokens / 60m TTL]
         OTEL[OpenTelemetry Traces & Logs]
     end
 
@@ -62,7 +61,6 @@ flowchart TD
     MCP --> AR
     AR --> CB
     CB --> ADK
-    CC -.-> ADK
     ADK --> RE
     RE --> OTEL
     RE --> HITL
@@ -82,20 +80,17 @@ The mission intelligence agent implements core enterprise architecture patterns 
    * Finite state machine (`CLOSED`, `OPEN`, `HALF_OPEN`) tracking tool health.
    * Trips after 3 consecutive failures with a 30-second cooldown, executing graceful degradation fallbacks.
    * `@retry_with_backoff` decorator transparently retries transient network errors across 3 attempts (1.0s, 2.0s, 4.0s).
-2. **Vertex AI Context Caching (`common/caching.py`)**:
-   * Compiles the 6 BigQuery schemas and 10 HUMINT report texts into a persistent `CachedContent` resource (>32k tokens) with a 60-minute TTL.
-   * Reduces Time-to-First-Token (TTFT) and cuts input token processing costs by up to **75%**.
-3. **Human-in-the-Loop (HITL) Command Gateways (`common/hitl.py`)**:
+2. **Human-in-the-Loop (HITL) Command Gateways (`common/hitl.py`)**:
    * Enforces UK MOD Joint Command doctrine: AI recommends, but only human command staff may authorize.
    * High-consequence kinetic strike advisories and offensive cyber countermeasures are automatically held pending submission of an operational confirmation token (`AUTH_<HASH>`).
-4. **Enterprise Grounding with Page-Level PDF Citations**:
+3. **Enterprise Grounding with Page-Level PDF Citations**:
    * Discovery Engine `contentSearchSpec` parses `derivedStructData.extractive_segments` to extract page numbers and snippets, adhering to ADK guardrails by omitting backend summaries (`summarySpec`).
    * Yields grounded, verifiable Markdown links (`[HUM-448, Page 2: Target Delta-9](https://storage.cloud.google.com/...#page=2)`) rendering interactive source chips in the Gemini Enterprise UI.
-5. **Tier 1 Fast-Path Intercepts (`fast_path_intercept`)**:
+4. **Tier 1 Fast-Path Intercepts (`fast_path_intercept`)**:
    * Intercepts conversational greetings and status queries locally in `< 50ms`, resolving with **0 LLM token cost**.
-6. **Model Right-Sizing (`gemini-3.8-flash` & `gemini-3.1-pro`)**:
+5. **Model Right-Sizing (`gemini-3.8-flash` & `gemini-3.1-pro`)**:
    * Balances sub-second tool generation speed and tactical responsiveness (Flash) with complex multi-domain reasoning and strategic analysis (Pro).
-7. **FinOps Alert Policies (`infrastructure/finops/`)**:
+6. **FinOps Alert Policies (`infrastructure/finops/`)**:
    * Monitors `session_turn_count` and `genai_token_usage` metrics at the per-session and fleet level.
    * Protects the project from agentic cost runaway by alerting on excessive token burn (>250k tokens) or potential infinite ReAct loops (>15 turns per session).
 
@@ -103,13 +98,13 @@ The mission intelligence agent implements core enterprise architecture patterns 
 
 ## 🧪 Automated Test Suite & Operational Verification
 
-The repository includes a comprehensive, automated test suite in [`src/tests/`](src/tests/) and an end-to-end runner [`src/tests/test_e2e.sh`](src/tests/test_e2e.sh) executing **39 total verification tests** across unit tests, SQL analytical joins, customer prompts, and Cloud Logging telemetry:
+The repository includes a comprehensive, automated test suite in [`src/tests/`](src/tests/) and an end-to-end runner [`src/tests/test_e2e.sh`](src/tests/test_e2e.sh) executing **35 total verification tests** across unit tests, SQL analytical joins, customer prompts, and Cloud Logging telemetry:
 
 ```bash
-# Execute the 17 unit tests (Offline / Sandboxed)
+# Execute the 13 unit tests (Offline / Sandboxed)
 python3 -m unittest discover -s src/tests -p "test_*.py" -v
 
-# Execute the complete 39-test End-to-End Suite in Mock/Hermetic mode
+# Execute the complete 35-test End-to-End Suite in Mock/Hermetic mode
 ./src/tests/test_e2e.sh --mock
 
 # Execute live verification against active Google Cloud infrastructure
@@ -122,13 +117,12 @@ python3 -m unittest discover -s src/tests -p "test_*.py" -v
 |---|---|---|:---:|:---:|
 | **Unit: Reliability** | Exponential backoff, Circuit breaker trip to `OPEN`, Graceful degradation | `src/tests/test_resilience.py` | 3 | ✅ PASSED |
 | **Unit: Security** | Command hold on kinetic/cyber actions, Token verification, Test bypass | `src/tests/test_hitl.py` | 3 | ✅ PASSED |
-| **Unit: Optimization** | >32k token cache generation, Global endpoint routing, Missing credentials fallback | `src/tests/test_caching.py` | 4 | ✅ PASSED |
 | **Unit: Attribution** | Page number parsing, Extractive segment Markdown link with `#page=N` | `src/tests/test_grounding.py` | 4 | ✅ PASSED |
 | **Unit: Observability** | OpenTelemetry traces/metrics & prompt/response message logging | `src/tests/test_telemetry.py` | 3 | ✅ PASSED |
 | **Integration: SQL** | 4 Multi-domain analytical SQL queries (Radar, EW, Cyber, Assets) | `src/tests/test_prompts.py` | 4 | ✅ PASSED |
 | **Interactive Prompts** | 18 Customer prompts across all Scenarios with cross-sensor validation | `src/tests/test_prompts.py` | 18 | ✅ PASSED |
 | **Telemetry Log Analysis** | Automated verification of trace IDs, GenAI metrics, and non-elided payloads | `src/common/telemetry_log_analyzer.py` | Audited | ✅ PASSED |
-| **Total Automated Coverage** | **Complete Functional, Guardrail & Observability Matrix** | **`test_e2e.sh`** | **39 / 39** | **✅ 100%** |
+| **Total Automated Coverage** | **Complete Functional, Guardrail & Observability Matrix** | **`test_e2e.sh`** | **35 / 35** | **✅ 100%** |
 
 
 ---
@@ -142,6 +136,9 @@ These prompts can be tested locally (`python3 src/agent/agent.py "<PROMPT>"`) or
 ---
 
 ## ⚡ Quick Start / Prerequisites
+
+> [!WARNING]
+> **A Gemini Enterprise License is strictly required** for the interactive Web Chat UI and Reasoning Engine capabilities to function properly. Without this, your users will not be able to interact with the deployed AI agent.
 
 * **Runtime Environment**: Python 3.11+ (`python3 --version`)
 * **Google Cloud SDK**: `gcloud` authenticated with active Google Cloud Project

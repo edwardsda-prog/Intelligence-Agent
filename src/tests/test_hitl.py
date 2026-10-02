@@ -4,6 +4,13 @@ Unit Tests for Human-in-the-Loop (HITL) Guardrails.
 
 import unittest
 import os
+import sys
+
+# Ensure src/agent is in sys.path
+agent_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "agent")
+if agent_dir not in sys.path:
+    sys.path.insert(0, agent_dir)
+
 from common.hitl import (
     evaluate_hitl_guardrail,
     generate_authorization_token,

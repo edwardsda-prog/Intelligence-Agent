@@ -21,9 +21,7 @@ flowchart TD
     end
 
     subgraph CachingAndModels["3. Optimization & Model Infrastructure"]
-        V_CACHE[("Vertex AI Context Cache<br/>CachedContent &gt;32k Tokens<br/>60m Rolling TTL")]
         GEMINI["Vertex AI Gemini 3.8 Flash<br/>thinking_level='LOW'<br/>Secure Inference Model"]
-        V_CACHE -.->|Prefix Cache Injection| GEMINI
     end
 
     subgraph AgentRuntime["4. Agent Runtime & Observability (WAF Reliability)"]
@@ -64,7 +62,6 @@ The platform utilizes a robust software architecture built around the ReAct Cogn
 
 - **ReAct Cognitive Loop**: Implements the `Think -> Act (Call Tool) -> Observe (Read Output) -> Repeat` cycle. 
 - **Tier 1 Fast-Path Intercepts**: Implementing deterministic pre-LLM regex and token interceptors that resolve routine status checks, greetings, and system readiness queries in $\le 50\text{ ms}$ with zero token consumption.
-- **Context Optimization**: Utilizes Vertex AI Context Caching for large contexts, such as database schemas and intelligence dossiers (>32k tokens), caching them with a 60-minute TTL on the global endpoint to achieve a 75% reduction in latency and token costs.
 - **Resilient Tool Egress**: Protects outbound connections to BigQuery, Discovery Engine, and Model Armor using in-memory circuit breakers with exponential retries (1.0s, 2.0s, 4.0s) and a 3-state Circuit Breaker (`CLOSED`, `OPEN`, `HALF_OPEN`).
 - **3-Tier Memory Architecture**:
   1. **Tier 1 (Working Memory)**: `VertexAiSessionService` maintaining in-flight session history and token window budgets.

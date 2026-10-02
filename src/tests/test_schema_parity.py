@@ -12,8 +12,8 @@ class TestSchemaParity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Initialize local SQLite DB if needed
-        db_script = os.path.join(os.path.dirname(__file__), "..", "lab2", "code", "setup_local_db.py")
-        db_path = os.path.join(os.path.dirname(__file__), "..", "lab2", "code", "mission_intel_local.db")
+        db_script = os.path.join(os.path.dirname(__file__), "..", "..", "data", "setup_local_db.py")
+        db_path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "mission_intel_local.db")
         if not os.path.exists(db_path):
             os.system(f"python3 {db_script}")
         cls.db_path = db_path

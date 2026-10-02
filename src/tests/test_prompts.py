@@ -40,7 +40,6 @@ from common.hitl import (
     HIGH_CONSEQUENCE_ACTIONS
 )
 from common.resilience import CircuitBreaker, retry_with_backoff
-from common.caching import get_or_create_mission_cache, build_cached_mission_context
 
 # Color constants for terminal
 GREEN = "\033[92m"

@@ -45,6 +45,12 @@ echo -e "${BOLD}🚀 Mission Intel Multi-Domain AI Workshop - Unified Setup${RES
 echo -e "${DIM}   Automated Cloud Foundation, Gemini Enterprise Intranet & Agent Environment${RESET}"
 echo -e "${BLUE}==============================================================================${RESET}"
 
+echo -e "${YELLOW}${BOLD}⚠️  ATTENTION: GEMINI ENTERPRISE LICENSE REQUIRED ⚠️${RESET}"
+echo -e "${YELLOW}The interactive Web Chat UI and Reasoning Engine capabilities deployed by this${RESET}"
+echo -e "${YELLOW}script require an active Gemini Enterprise license on your Google Workspace or${RESET}"
+echo -e "${YELLOW}Cloud Identity account. The agent will not function without it.${RESET}"
+echo -e "${BLUE}==============================================================================${RESET}"
+
 # ------------------------------------------------------------------------------
 # 1. Credential Synchronization for Sandboxed & CloudShell Execution
 # ------------------------------------------------------------------------------

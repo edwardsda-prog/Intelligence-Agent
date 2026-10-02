@@ -27,7 +27,6 @@ As this solution targets secure enterprise environments, cloud-native offerings 
 *   **Tier 1 Fast-Path Intercepts:** Implementing deterministic pre-LLM regex and token interceptors that resolve routine status checks, greetings, and system readiness queries in $\le 50\text{ ms}$ with zero token consumption, preserving GPU/TPU compute for tactical correlation.
 *   **Structured Telemetry (MCP):** Utilizing the **Model Context Protocol (MCP)** to govern secure, decoupled tool execution against secure relational databases and data warehouses on sandboxed Cloud Run microservices, replacing public-cloud SaaS dependencies.
 *   **Unstructured Multimodal RAG:** Processing operational HUMINT/IMINT PDF field dossiers through localized unstructured datastores (Google Cloud Discovery Engine) with optical character recognition (OCR) and extractive segment indexing to power retrieval-augmented generation.
-*   **Context Caching (Performance & Cost Optimization):** Pre-compiling BigQuery schema definitions and the static HUMINT document corpus into a server-side Context Cache (>32k tokens) with a 60-minute TTL, slashing Time-to-First-Token (TTFT) by $>60\%$ and input token processing overhead by $\ge 75\%$ across repetitive mission queries.
 *   **Enterprise Grounding & Attribution:** Mandating page-level PDF citations and extractive text segments (`#page=N`) across all unstructured RAG outputs to eliminate operational hallucinations and provide joint command analysts with instant, verifiable visual confirmation.
 
 ### 2.3. DevSecOps, Governance & Coalition Federation Strategy
@@ -56,7 +55,6 @@ To ensure validation through iterative pilots ("Start Small, Iterate & Refine"),
 *   **100% Secure Operation:** The entire Agentic AI stack—including the orchestrator model, MCP servers, and enterprise chat UI—must operate entirely within the secure enterprise perimeter with zero external internet dependencies.
 *   **Extensible Tool Governance:** The architecture must utilize the Model Context Protocol (MCP) to standardize tool creation, allowing UK DIB engineers to seamlessly integrate legacy UK MOD databases as discrete agent tools.
 *   **Multimodal Synthesis:** The system must natively correlate structured tracking IDs (e.g., radar signatures, cyber IOCs) with unstructured document intelligence (e.g., optical crops from field PDFs).
-*   **Context Caching TTFT Reduction:** Multi-turn analytical sessions utilizing server-side cached context must demonstrate Time-to-First-Token (TTFT) of $< 1.0\text{ s}$ and an input token cost reduction of $\ge 75\%$.
 *   **High Availability & Fault Tolerance:** External tool integrations (MCP, Discovery Engine, Model Armor) must tolerate transient faults via circuit breakers and provide fallback intelligence summaries without aborting the mission turn.
 *   **End-to-End Observability:** 100% of agent reasoning turns must emit OpenTelemetry semantic traces and retain full un-elided prompt/response audit records.
 

@@ -46,6 +46,7 @@ class TelemetryAnalysisResult:
     # Audit trail
     total_entries_inspected: int = 0
     failure_reasons: List[str] = field(default_factory=list)
+    custom_spans_found: List[str] = field(default_factory=list)
     summary: str = ""
 
     @property
@@ -142,6 +143,17 @@ class TelemetryLogAnalyzer:
         )
         if span_id and span_id not in result.span_ids_found:
             result.span_ids_found.append(str(span_id))
+            
+        span_name = (
+            entry.get("span_name") or
+            entry.get("jsonPayload", {}).get("span_name") or
+            entry.get("attributes", {}).get("span_name") or
+            entry.get("event_name") or
+            entry.get("jsonPayload", {}).get("event_name") or
+            entry.get("attributes", {}).get("event_name")
+        )
+        if span_name and span_name not in result.custom_spans_found:
+            result.custom_spans_found.append(str(span_name))
 
         # 2. Extract payload attributes (handling jsonPayload, labels, otel, attributes, or root level)
         payload = entry.get("jsonPayload", entry)

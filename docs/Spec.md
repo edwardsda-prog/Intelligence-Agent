@@ -36,7 +36,7 @@ bash -n infrastructure/setup.sh && bash -n src/tests/test_e2e.sh
 ### 1.2. Testing & Conformance
 * **Test Runner:** Python `unittest` harness integrated via `test_e2e.sh`.
 * **Test Suites:**
-  * Unit tests reside in `src/tests/` (`test_data.py`, `test_resilience.py`, `test_telemetry.py`, `test_hitl.py`, `test_caching.py`, `test_grounding.py`, `test_performance.py`, `test_opsec.py`, `test_rag.py`).
+  * Unit tests reside in `src/tests/` (`test_data.py`, `test_resilience.py`, `test_telemetry.py`, `test_hitl.py`, `test_grounding.py`, `test_performance.py`, `test_opsec.py`, `test_rag.py`).
   * Conformance tests evaluate all scenarios sequentially, validating Unit Tests, Analytical SQL Queries, and Interactive Prompts.
 
 ### 1.3. Project Structure & File Layout
@@ -65,7 +65,6 @@ bash -n infrastructure/setup.sh && bash -n src/tests/test_e2e.sh
   * Run `./src/tests/test_e2e.sh --mock` before proposing git commits.
   * Maintain security classification strictly as `Demonstrator` (or `Demonstrator // REL TO NATO`).
   * Source all cloud environment parameters dynamically (`PROJECT_ID`, `LOCATION`, `STAGING_BUCKET`).
-  * Route Gemini 3.8 Flash (`gemini-3.8-flash`) Context Caching to `location="global"`.
   * Ensure dual telemetry (OpenTelemetry spans and full prompt/response message logging) is configured.
 
 * **⚠️ Ask First:**
@@ -94,8 +93,8 @@ As a Defence Enterprise Cloud Architect, I want database tools isolated on serve
 ### User Story 4 - DevSecOps OPSEC Sanitization & Human-in-the-Loop Gateway (Priority: P4)
 As a UK MOD Operational Security (OPSEC) Officer, I want automated redaction of sensitive tactical coordinates (MGRS) using Cloud DLP and Model Armor, and mandatory cryptographic authorization for kinetic actions (`AUTH_<HASH>`).
 
-### User Story 5 - Multimodal RAG with Page Citations & Global Context Caching (Priority: P5)
-As an Intelligence Watch Officer, I want to query unstructured multimodal HUMINT PDF dossiers with exact page-level citations alongside high-performance context caching (>32k tokens, 60m TTL, `location="global"`).
+### User Story 5 - Multimodal RAG with Page Citations (Priority: P5)
+As an Intelligence Watch Officer, I want to query unstructured multimodal HUMINT PDF dossiers with exact page-level citations.
 
 ### User Story 6 - Scientific Harness Evaluation across 7 Quality Dimensions (Priority: P6)
 As a Defence AI Evaluation Engineer, I want automated offline evaluation benchmarking the agent against a golden intelligence dataset across 7 Quality Dimensions (Groundedness, Factual Accuracy, Instruction Following, Safety & OPSEC, Latency & Cost Efficiency, Actionability, Digestibility), requiring an aggregate score of $\ge 4.5/5.0$.
@@ -121,7 +120,6 @@ As a NATO Coalition Task Force Commander, I want allied partner agents to query 
 * **FR-011**: System MUST intercept all kinetic engagement advisories, holding execution under `[HUMAN-IN-THE-LOOP HOLD REQUIRED]` until a valid cryptographic token (`AUTH_<HASH>`) is provided.
 * **FR-012**: System MUST integrate Google Cloud Discovery Engine to perform semantic vector search over multimodal HUMINT PDF dossiers with `maxExtractiveSegmentCount: 2`.
 * **FR-013**: System MUST format all unstructured intelligence citations as Markdown deep links with page-level anchors.
-* **FR-014**: When static context exceeds 32,768 tokens, the system MUST create and reuse a Vertex AI `CachedContent` resource in `location="global"`.
 * **FR-015**: System MUST provide an automated offline evaluation script executing Vertex AI `EvalTask`.
 * **FR-016**: System MUST expose an Agent-to-Agent (A2A) JSON-RPC 2.0 federation endpoint publishing an Agent Card.
 
@@ -132,8 +130,6 @@ As a NATO Coalition Task Force Commander, I want allied partner agents to query 
 ### 4.1. Measurable Outcomes
 * **SC-001**: **Deterministic Fast-Path Latency:** 100% of basic status requests MUST resolve in $\le \mathbf{50\text{ ms}}$ consuming zero LLM tokens.
 * **SC-002**: **P95 Analytical Query Latency:** Complex multi-domain queries MUST complete with a 95th percentile latency of $\le \mathbf{3.5\text{ seconds}}$.
-* **SC-003**: **Context Caching Cost Reduction:** Sessions utilizing server-side cached context MUST demonstrate a $\ge \mathbf{75\%}$ reduction in input token processing cost.
-* **SC-004**: **Context Caching Time-to-First-Token (TTFT):** Multi-turn sessions with active context cache MUST achieve a TTFT of $< \mathbf{1.0\text{ second}}$.
 * **SC-005**: **OPSEC Coordinate Leakage Rate:** Model responses MUST achieve a $\mathbf{0.0\%}$ leakage rate for raw MGRS coordinates across external boundaries.
 * **SC-006**: **Human-in-the-Loop Doctrinal Safety:** 100% of kinetic strike advisories MUST be intercepted.
 * **SC-007**: **Offline Evaluation Benchmark Score:** The agent MUST achieve an aggregate score of $\ge \mathbf{4.5 / 5.0}$ across the 7 Quality Dimensions.
