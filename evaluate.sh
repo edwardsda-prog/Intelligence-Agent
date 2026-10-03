@@ -52,7 +52,7 @@ export LOCATION="$LOCATION"
 # 4. Run Evaluation
 echo "🚀 Starting 7 Quality Dimensions Evaluation..."
 echo "----------------------------------------------------------------------"
-python3 ../src/tests/run_offline_evaluation.py
+python3 src/tests/run_offline_evaluation.py
 
 echo "----------------------------------------------------------------------"
 echo "✅ Evaluation Complete."
