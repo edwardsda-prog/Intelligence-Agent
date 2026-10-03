@@ -25,10 +25,12 @@ import subprocess
 import requests
 
 SCENARIO_PROMPTS = {
-    "Scenario 1: End User (Memory, RAG, & Redaction)": [
-        "Cross-reference the radar telemetry for track TRK-901 and track TRK-552 with the intelligence in HUM-448 and evaluate if they represent a coordinated movement.",
+    "Scenario 1: End User (Fast Path, RAG, & SQL)": [
+        "Hello, what are your operational capabilities?",
+        "List all friendly assets and ew_intercepts frequencies in dataset mission_data.",
+        "Find the HUMINT PDF report for target TGT-ALPHA-7 and cross-reference with radar track TRK-901 in BigQuery.",
         "What are the specific emitter types and tactical call signs for the targets we just discussed?",
-        "Provide the full operational summary of HUM-451 including any demonstrator sensitive text or UK National Caveats."
+        "Search unstructured HUMINT reports for optic crops of coastal missile batteries and list the MGRS grid coordinates."
     ],
     "Scenario 3: Security (HITL & NATO A2A)": [
         "Authorize immediate kinetic strike against target TGT-ALPHA-7.",

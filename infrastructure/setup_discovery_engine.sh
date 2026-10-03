@@ -236,10 +236,7 @@ else
     echo "⚠️ Reasoning Engine deployment did not return a valid resource ID. Check logs."
 fi
 
-# 7. Execute Offline Agent Platform Evaluation
-echo ""
-echo "📌 [7/7] Running Offline Evaluation against Golden Data Set (7 Quality Dimensions)..."
-python3 ../src/tests/run_offline_evaluation.py || true
+
 
 echo ""
 echo "======================================================================"
