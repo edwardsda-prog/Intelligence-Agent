@@ -19,11 +19,9 @@ When you run the deployment script, you are not managing raw servers. You are de
 
 ## 2. Prerequisites
 
-Before deploying, ensure you have the following installed and authenticated:
 - **Python 3 & Requests**: You must have Python 3 installed on your local machine along with the `requests` library (`pip install requests`).
 - **Google Cloud SDK (`gcloud`)**: You must be logged in and configured to your active project (`gcloud auth login` and `gcloud config set project [YOUR_PROJECT_ID]`).
 - **Google Agent Developer Kit (ADK)**: Ensure the ADK CLI is installed and available in your environment (`pip install google-adk` or equivalent).
-- **Base Infrastructure**: Ensure that BigQuery datasets and the Vertex AI Search (Discovery Engine) unstructured RAG datastores have been provisioned (this is handled separately via `infrastructure/provision_all.sh`).
 
 ---
 
@@ -36,7 +34,7 @@ We have provided a clean wrapper script in the root directory to handle deployme
    ```bash
    chmod +x deploy.sh
    ```
-3. Run the deployment script. By default, it runs a "quick" test suite after deployment:
+3. Run the deployment script. The wrapper will automatically provision your base infrastructure (BigQuery and Discovery Engine) and then deploy the agent:
    ```bash
    ./deploy.sh
    ```
