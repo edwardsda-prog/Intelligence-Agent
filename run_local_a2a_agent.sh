@@ -143,4 +143,4 @@ echo ""
 echo "(Press Ctrl+C to stop the server)"
 echo "----------------------------------------------------------------------"
 
-adk web --port 8080 --a2a
+adk web src/a2a_mesh/my_partner_agent --port 8080 --a2a
