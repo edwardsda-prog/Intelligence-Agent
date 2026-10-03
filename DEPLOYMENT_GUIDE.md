@@ -13,7 +13,11 @@ When you run the deployment script, you are not managing raw servers. You are de
 3. **Cloud Monitoring Dashboards:** It provisions two specific dashboards in your GCP project:
    - *Observability & OpenTelemetry Metrics* (For Platform/FinOps Engineers)
    - *Model Armor & OPSEC Compliance Metrics* (For Security/SecOps)
-4. **Agent Registry / Testing:** It automatically prunes stale deployments, registers the new agent endpoint, and runs a quick verification test.
+4. **Base Infrastructure & Data Provisioning:** The deployment script automatically determines your target project based on your active `gcloud` configuration (`gcloud config get-value project`). It will:
+   - Create a Google Cloud Storage (GCS) bucket named `gs://[YOUR_PROJECT_ID]-humint-docs`.
+   - Upload **15 unstructured HUMINT PDF reports** and **1 JSONL metadata file** into the bucket.
+   - Provision BigQuery datasets and Vertex AI Search (Discovery Engine) datastores using this data.
+5. **Agent Registry / Testing:** It automatically prunes stale deployments, registers the new agent endpoint, and runs a quick verification test.
 
 ---
 
