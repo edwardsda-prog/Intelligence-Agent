@@ -1,6 +1,8 @@
-# Test Suite Prompts & Queries
+# Offline Evaluation Prompts & Queries
 
-This document contains all the interactive prompts and SQL queries utilized by the automated end-to-end evaluation suite (`src/tests/test_prompts.py`). These prompts are designed to rigorously test the platform across all 7 operational scenarios and quality dimensions.
+This document contains all the interactive prompts and SQL queries utilized by the LLM-as-a-Judge offline evaluation suite (`src/tests/run_offline_evaluation.py`, executed via `./evaluate.sh`). 
+
+**Note**: These are separate from the core demo scenarios found in `Trainer_Scenarios.md`. These prompts are designed specifically to rigorously test the platform across all 7 operational scenarios and quality dimensions against the Golden Data Set.
 
 ## Data Foundations & BigQuery Structured Queries
 
