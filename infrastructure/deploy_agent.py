@@ -412,10 +412,49 @@ def deploy_infrastructure_security(project_id: str):
         else:
             print(f"      ❌ Error importing {cmd[4]}: {res.stderr.strip()}")
 
+def check_base_infrastructure(project_id: str, location: str):
+    print("\n📌 [5.8/6] Checking Base Infrastructure (BigQuery & Discovery Engine)...")
+    
+    # 1. Check BigQuery Dataset
+    try:
+        res = subprocess.run(["bq", "show", "--dataset", f"{project_id}:mission_data"], capture_output=True, text=True)
+        if res.returncode == 0:
+            print("   ✅ BigQuery Dataset 'mission_data' is present.")
+        else:
+            print(f"   ❌ BigQuery Dataset 'mission_data' not found or error: {res.stderr.strip()}")
+    except Exception as e:
+        print(f"   ❌ Error checking BigQuery: {e}")
+
+    # 2. Check Discovery Engine DataStore
+    try:
+        token = get_auth_token()
+        headers = {"Authorization": f"Bearer {token}", "X-Goog-User-Project": project_id}
+        url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/dataStores"
+        res = requests.get(url, headers=headers, timeout=15)
+        if res.status_code == 200:
+            data = res.json()
+            datastores = data.get("dataStores", [])
+            found = False
+            for ds in datastores:
+                ds_id = ds.get("name", "").split("/")[-1]
+                if ds_id.startswith("humint-pdf-datastore"):
+                    print(f"   ✅ Discovery Engine DataStore '{ds_id}' is present.")
+                    found = True
+                    break
+            if not found:
+                print("   ❌ Discovery Engine DataStore starting with 'humint-pdf-datastore' not found.")
+        else:
+            print(f"   ❌ Error checking Discovery Engine DataStores (HTTP {res.status_code}): {res.text}")
+    except Exception as e:
+        print(f"   ❌ Error checking Discovery Engine: {e}")
+
 def run_agent_test_validation(project_id: str, location: str, re_id: str, mode: str):
     if mode == "none":
         print("ℹ️ Skipping test validation (--test none specified).")
         return
+
+    if mode == "demo":
+        check_base_infrastructure(project_id, location)
 
     print(f"\n======================================================================")
     print(f"🧪 Executing Post-Deploy Validation Test Suite (Mode: {mode.upper()})")

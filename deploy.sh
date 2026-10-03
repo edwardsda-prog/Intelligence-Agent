@@ -17,6 +17,10 @@ echo "🚀 Starting Intelligence Agent Deployment Wrapper..."
 echo "Running: python3 infrastructure/deploy_agent.py $ARGS"
 echo "----------------------------------------------------------------------"
 
+# Execute the base infrastructure provisioning
+echo "📌 Running Base Infrastructure Provisioning..."
+./infrastructure/provision_all.sh
+
 # Execute the core deployment python script
 python3 infrastructure/deploy_agent.py $ARGS
 
