@@ -1,118 +1,49 @@
 # Intelligence Agent: Multi-Domain Agentic Intelligence Application
 
-**Security Classification:** Demonstrator // REL TO NATO  
-**Methodology:** Google Cloud Well-Architected Framework (WAF) for AI/ML Operational Excellence  
+Welcome! The Intelligence Agent is a demonstrator application built for the UK Ministry of Defence (MOD). This project shows how we can use Generative AI to securely connect the dots across different intelligence sources—like radar tracks, cyber threat reports, and PDF field documents—in seconds instead of hours.
 
-## 1. Vision & Scope (The Why)
-
-The Intelligence Agent is a secure Agentic AI ecosystem designed for the UK Ministry of Defence (MOD) Joint Command Staff. It synthesizes structured operational telemetry and unstructured field reports in real-time. By utilizing localized Generative AI foundation models (`gemini-3.8-flash` and `gemini-3.1-pro`), this application transforms multi-domain data—spanning cyber, electronic warfare (EW), radar, satellite reconnaissance, and human intelligence (HUMINT)—into immediate Command and Control (C2) decision advantage.
-
-### Operational Outcomes
-*   **C2 Decision Acceleration:** Reduces cross-domain intelligence correlation from hours to seconds (<30s per complex query).
-*   **Sub-Second Deterministic Response:** Routine checks resolve via Tier 1 Fast-Path Intercepts in $\le 50\text{ ms}$ at zero token cost.
-*   **Command Safety Compliance:** 100% of kinetic and offensive cyber advisories are intercepted by a Human-in-the-Loop (HITL) gate until explicitly authorized.
-*   **Analyst Capacity:** Enables a 5x increase in report processing volume without requiring additional headcount.
+Whether you are a frontline analyst, the engineer deploying the system, or the security expert keeping it locked down, this guide will help you understand what this platform does and how it works for you.
 
 ---
 
-## 2. Architecture & Ecosystem (The What)
+## 1. The End User Experience (Intelligence Analysts)
 
-The platform is built on Google Cloud Platform (GCP) and utilizes the Google Agent Developer Kit (ADK 2.0), Model Context Protocol (MCP), and Vertex AI.
+As an intelligence analyst using **Gemini Enterprise**, your goal is to make fast, accurate decisions without getting bogged down in manual data gathering. 
 
-```mermaid
-flowchart TD
-    subgraph DataLayer["1. Secure Data Foundations"]
-        BQ[("BigQuery<br/>mission_data<br/>6 Core Tables + Joined View")]
-        GCS[("Cloud Storage Bucket<br/>Operational HUMINT PDFs")]
-        DE["Discovery Engine / Vertex AI Search<br/>Unstructured Datastore<br/>Extractive Segments Enabled"]
-        GCS -->|Automated OCR & Ingestion| DE
-    end
-
-    subgraph ToolGovernance["2. Tool Hosting & Governance"]
-        CR["Cloud Run Serverless Container<br/>Managed BigQuery MCP Server"]
-        AR["Agent Registry<br/>Service Catalog & ACLs"]
-        CR -.->|Registers Endpoint| AR
-        BQ <-->|IAM-Authenticated SQL| CR
-    end
-
-    subgraph CachingAndModels["3. Optimization & Model Infrastructure"]
-        GEMINI["Vertex AI Gemini 3.8 Flash<br/>thinking_level='LOW'<br/>Secure Inference Model"]
-    end
-
-    subgraph AgentRuntime["4. Agent Runtime & Observability (WAF Reliability)"]
-        RE["Vertex AI Reasoning Engine<br/>Managed ADK Container Runtime"]
-        OTEL["Google Cloud Trace & Logging<br/>OpenTelemetry gen_ai.system Spans"]
-        CB["Resilience Layer<br/>Circuit Breakers & Exponential Retries"]
-        
-        RE -->|Exports Spans| OTEL
-        RE <-->|Inference| GEMINI
-        RE --> CB
-        CB <-->|Tool Execution| AR
-        CB <-->|REST Search API| DE
-    end
-
-    subgraph SecurityLayer["5. Zero-Trust Security & DevSecOps"]
-        HITL["Human-in-the-Loop Gate<br/>Command Auth Tokens AUTH_HASH"]
-        MA["Google Cloud Model Armor<br/>sanitizeModelResponse"]
-        DLP["Cloud Data Loss Prevention (DLP)<br/>Custom MGRS InfoType & De-identification"]
-        
-        RE --> HITL
-        HITL --> MA
-        MA -.->|Inspect / Redact| DLP
-    end
-
-    subgraph OperationalFrontEnd["6. Front-End & Coalition Federation"]
-        GW["Agent Gateway<br/>Proxy, Rate Limiting & Auth"]
-        GE["Gemini Enterprise Assistant<br/>Chat UI with #page=N Deep Links"]
-        COALITION["Allied Coalition Partner Agents<br/>A2A JSON-RPC Protocol"]
-        
-        MA --> GW
-        GW <--> GE
-        GW <--> COALITION
-    end
-```
-
-### Core Design Principles
-*   **ReAct Cognitive Loop**: Implements the `Think -> Act -> Observe -> Repeat` paradigm.
-*   **Resilience & Governance**: Utilizes 3-state Circuit Breakers (`CLOSED`, `OPEN`, `HALF_OPEN`) with exponential backoff for tool fault tolerance.
-*   **3-Tier Memory**:
-    1.  *Tier 1 (Working Memory)*: In-flight session history via `VertexAiSessionService`.
-    2.  *Tier 2 (Transaction State)*: Request graph execution blackboard.
-    3.  *Tier 3 (Long-Term Memory)*: Persistent threat domain mapping across sessions.
+*   **Ask Natural Questions:** You don't need to write complex database queries. You can ask Gemini things like, *"Cross-reference radar track TRK-901 with the intelligence in HUM-448."* The agent does the heavy lifting, simultaneously pulling live data from BigQuery and scanning unstructured PDF reports to give you a single, unified answer.
+*   **Trust But Verify (Secure Citations):** Hallucinations are not an option. When the agent references a PDF field report, it provides a direct, clickable link to the exact page of the secure document. You can instantly verify the source data yourself natively within the Gemini UI.
+*   **A Conversation That Remembers:** The agent features long-term memory. If you ask a follow-up question about "those targets," it remembers exactly which radar tracks and reports you were just discussing, allowing for a seamless, continuous workflow.
 
 ---
 
-## 3. Agent Platform & Integrations (The How)
+## 2. The Operations Experience (Platform & FinOps Engineers)
 
-### Vertex AI Reasoning Engine
-The application standardizes on **Vertex AI Reasoning Engine** for its managed ADK container runtime. This provides managed auto-scaling, sub-second cold starts, and built-in durable multi-turn session persistence, removing infrastructure toil for stateful enterprise agents.
+For the team deploying and monitoring the application, reliability and cost-control are paramount. This application is built on the **Google Agent Developer Kit (ADK 2.0)** and deployed as a managed **Vertex AI Reasoning Engine**, which takes the headache out of infrastructure management.
 
-### Gemini Enterprise & Grounding
-The unstructured RAG pipeline leverages Vertex AI Search (Discovery Engine). The Agent Platform securely authenticates via SPIFFE Workload Identity (SVIDs). Extractive segments power precise citations, which natively render in the Gemini Enterprise UI as clickable document chips (`#page=N`), driving users directly to the raw, authenticated PDF hosted in Google Cloud Storage to eliminate hallucinations.
-
-### Zero-Trust & Model Armor
-Inline security filters using Google Cloud Model Armor actively monitor inputs and outputs. Sensitive operational data, such as MGRS tactical coordinates or UK National Caveats, are automatically redacted and replaced with tokenized identifiers (`[CUSTOM_MGRS_COORDINATES]`), ensuring safe data flow.
-
-### Coalition Federation (Agent-to-Agent)
-A NATO-first intelligence sharing strategy is enabled through an A2A protocol. A secure UK Host Agent processes authenticated JSON-RPC 2.0 requests from Allied Partner Agents, automatically sanitizing outputs to `Demonstrator // REL TO NATO` standards before transmission, allowing real-time federated intelligence sharing across boundaries.
+*   **Deploy with Ease:** Forget about managing servers or handling cold-starts. Deploying the agent is straightforward, and the Reasoning Engine automatically scales to meet demand.
+*   **See Everything (Observability):** We provide out-of-the-box Google Cloud Monitoring dashboards. You can track exactly how long each tool takes to run and trace the agent's thought process step-by-step using OpenTelemetry.
+*   **Control Costs (FinOps):** AI token costs can spiral if left unchecked. Our dashboards visualize your "Token Burn," allowing you to see exactly how many input and output tokens are consumed per session. This helps you prevent runaway loops and right-size your models to save money.
+*   **Memory Management:** Operations also oversees the multi-tier memory system (from working memory to long-term threat domain tracking), ensuring the agent stays smart without bloating its context window and driving up costs.
 
 ---
 
-## 4. Trainer Scenarios
+## 3. The Security Experience (SecOps & Coalition Partners)
 
-The Intelligence Agent is validated against three core operational scenarios:
+Security isn't an afterthought; it's the foundation of the platform. This application operates under a Zero-Trust architecture designed for military-grade compliance.
 
-### Scenario 1: Introduction to the Intelligence Agent (End User)
-*   **Multi-Domain Reasoning**: Correlates structured BigQuery tracking telemetry (e.g., TRK-901) with unstructured Discovery Engine HUMINT PDFs simultaneously.
-*   **Secure Citations**: Demonstrates Gemini Enterprise UX grounding with natively clickable source links preventing hallucination.
-*   **Memory Persistence**: Showcases multi-turn conversational context utilizing the ADK memory service.
-*   **PII Redaction**: Illustrates Model Armor intercepting sensitive data, redacting PII and Caveats while preserving necessary tactical coordinates for mapping workflows.
+*   **Human-in-the-Loop (HITL):** AI should recommend, but humans must decide. If the agent suggests a high-consequence action (like a kinetic strike or an offensive cyber countermeasure), the system halts. It requires explicit cryptographic authorization from command staff before proceeding.
+*   **Inline Data Redaction (Model Armor):** We use Google Cloud Model Armor and Data Loss Prevention (DLP) to actively scan everything the AI reads and writes. If it detects sensitive information—like raw Military Grid Reference System (MGRS) coordinates or UK National Caveats—it automatically redacts them before they ever reach the screen.
+*   **Identity First (SPIFFE):** We don't use static passwords or service account keys that can be leaked. The agent uses temporal, workload-based identities to securely access databases and search engines.
+*   **Safe Coalition Sharing:** Need to share intelligence with NATO partners? The Agent-to-Agent (A2A) protocol allows our agent to securely communicate with allied agents. Our security boundaries automatically sanitize the outgoing information to ensure only releasable data crosses the network.
 
-### Scenario 2: Observability & FinOps (Operations)
-*   **Observability Dashboard**: Monitors Agent Execution Latency and semantic tool traces (`gen_ai.callback.model_armor`, `execute_bigquery_sql`) via OpenTelemetry in Google Cloud Monitoring.
-*   **FinOps Governance**: Visualizes token burn (Input vs. Output) preventing loop-thrashing and enabling right-sizing of foundation models based on precise token usage.
+---
 
-### Scenario 3: Security & Working with Partners (SecOps & Coalition)
-*   **HITL Command Gates**: Demonstrates the intercept of high-consequence kinetic or offensive cyber strikes requiring cryptographic confirmation tokens.
-*   **SPIFFE Authentication**: Validates secure, temporal workload identity access over static service account keys.
-*   **NATO A2A Integration**: Executes cross-domain threat assessments between sovereign enclaves, automatically enforcing Model Armor releasability and boundary sanitization policies.
+## 4. Try It Out: Trainer Scenarios
+
+If you are demonstrating this platform, we have built three specific scenarios that perfectly highlight these personas in action:
+
+*   **Scenario 1:** Highlights the **End User** experience, focusing on multi-domain reasoning, secure citations, and memory.
+*   **Scenario 2:** Highlights the **Operations** experience, showing off the Observability and FinOps dashboards.
+*   **Scenario 3:** Highlights the **Security** experience, demonstrating the HITL command gates, Model Armor redaction, and NATO partner integration.
+
+*(For detailed scripts, please see `docs/Trainer_Scenarios.md`)*
