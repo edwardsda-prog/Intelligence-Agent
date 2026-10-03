@@ -15,8 +15,9 @@ adk web --port 8080 --a2a
 
 Once running, navigate to `http://localhost:8080` in your web browser.
 
-> [!NOTE]
-> We have provided a wrapper script `run_local_a2a_agent.sh` which automatically tests your deployed Reasoning Engine and then launches `adk web` for you.
+> [!IMPORTANT]
+> **Always run the standalone bash script first:** `./run_local_a2a_agent.sh`
+> This script ensures all dependencies are installed and verifies that you have an active Reasoning Engine deployed in your GCP project before launching the ADK Web UI.
 
 ## 2. Navigating the Views
 

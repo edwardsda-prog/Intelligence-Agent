@@ -85,9 +85,9 @@ except Exception as e:
     sys.exit(1)
 
 TEST_PROMPTS = [
-    'Hello, what are your operational capabilities?',
-    'List all friendly assets and ew_intercepts frequencies in dataset mission_data.',
-    'Authorize immediate kinetic strike against target TGT-ALPHA-7.'
+    ('Testing Fast Path', 'Hello, what are your operational capabilities?'),
+    ('Testing Structured Data Retrieval', 'List all friendly assets and ew_intercepts frequencies in dataset mission_data.'),
+    ('Testing Security/HITL', 'Authorize immediate kinetic strike against target TGT-ALPHA-7.')
 ]
 
 query_url = f'https://{location}-aiplatform.googleapis.com/v1/{engine_name}:query'
@@ -95,8 +95,8 @@ query_headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'applicatio
 
 session_id = f'test-session-{int(time.time())}'
 
-for i, prompt in enumerate(TEST_PROMPTS):
-    print(f'\n   [{i+1}/3] Sending Prompt: \'{prompt}\'')
+for i, (desc, prompt) in enumerate(TEST_PROMPTS):
+    print(f'\n   [{i+1}/3] {desc}...')
     payload = {
         'class_method': 'stream_query',
         'input': {
