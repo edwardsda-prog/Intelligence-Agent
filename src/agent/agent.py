@@ -44,6 +44,7 @@ PROJECT_ID = resolve_project_id()
 LOCATION = os.environ.get("LOCATION", "us-central1")
 ENGINE_ID = os.environ.get("ENGINE_ID", "mission-intel-app")
 DATASTORE_ID = os.environ.get("DATASTORE_ID", "humint-pdf-datastore-1790507563")
+DATASTORE_PROJECT_ID = os.environ.get("DATASTORE_PROJECT_ID", "antig-dave")
 
 # --- OPTIMIZATION 1: Tier 1 Fast-Path Intercept ---
 # LEARNING SCENARIO OBJECTIVE: Performance & Cost Optimization (Latency & Token Caching equivalent).
@@ -256,7 +257,7 @@ def search_humint_reports(query: str) -> str:
             span.set_status(StatusCode.ERROR, str(e))
             return f"Authentication error: {e}"
 
-        url = f"https://discoveryengine.googleapis.com/v1/projects/{PROJECT_ID}/locations/global/collections/default_collection/dataStores/{DATASTORE_ID}/servingConfigs/default_search:search"
+        url = f"https://discoveryengine.googleapis.com/v1/projects/{DATASTORE_PROJECT_ID}/locations/global/collections/default_collection/dataStores/{DATASTORE_ID}/servingConfigs/default_search:search"
         headers = {
             "Authorization": f"Bearer {token}",
             "X-Goog-User-Project": PROJECT_ID,
@@ -279,7 +280,7 @@ def search_humint_reports(query: str) -> str:
         try:
             resp = requests.post(url, headers=headers, json=body)
             if resp.status_code != 200:
-                engine_url = f"https://discoveryengine.googleapis.com/v1/projects/{PROJECT_ID}/locations/global/collections/default_collection/engines/{ENGINE_ID}/servingConfigs/default_search:search"
+                engine_url = f"https://discoveryengine.googleapis.com/v1/projects/{DATASTORE_PROJECT_ID}/locations/global/collections/default_collection/engines/{ENGINE_ID}/servingConfigs/default_search:search"
                 resp = requests.post(engine_url, headers=headers, json=body)
 
             span.set_attribute("http.status_code", resp.status_code)
@@ -368,7 +369,7 @@ def search_humint_reports(query: str) -> str:
                 "spiffe_id": spiffe_id,
                 "tool_name": "search_humint_reports"
             })
-            log_discovery_engine_user_event(query=query, user_pseudo_id="session-user-default", datastore_id=DATASTORE_ID, project_id=PROJECT_ID)
+            log_discovery_engine_user_event(query=query, user_pseudo_id="session-user-default", datastore_id=DATASTORE_ID, project_id=DATASTORE_PROJECT_ID)
             res_list = output if output else [{"title": "No results", "link": "", "content": "No matching HUMINT reports found."}]
             return json.dumps(res_list, indent=2)
         except Exception as err:
@@ -398,6 +399,38 @@ def apply_model_armor(context, response):
     try:
         if not response or not hasattr(response, "content") or not response.content or not hasattr(response.content, "parts") or not response.content.parts:
             return response
+            
+        # Determine if this is an A2A query
+        is_a2a_query = False
+        try:
+            user_id_str = str(getattr(context, "user_id", "") or getattr(context, "user", "") or "")
+            if "spiffe://" in user_id_str.lower() or "nato" in user_id_str.lower() or "a2a" in user_id_str.lower():
+                is_a2a_query = True
+                
+            headers = getattr(context, "headers", {}) or {}
+            if hasattr(context, "state") and isinstance(context.state, dict):
+                headers = context.state.get("headers", headers)
+                if context.state.get("is_a2a_session"):
+                    is_a2a_query = True
+            
+            if any(h in headers for h in ["x-a2a-task-id", "x-a2a-agent-id", "X-A2A-Task-Id", "X-A2A-Agent-Id"]):
+                is_a2a_query = True
+
+            if not is_a2a_query and hasattr(context, "session") and hasattr(context.session, "messages"):
+                for msg in reversed(context.session.messages):
+                    msg_text = getattr(msg, "content", "") or getattr(msg, "text", "") or ""
+                    if not msg_text and hasattr(msg, "content") and hasattr(msg.content, "parts") and msg.content.parts:
+                        msg_text = str(getattr(msg.content.parts[0], "text", ""))
+                    msg_str = str(msg_text)
+                    if "A2A_QUERY" in msg_str or "spiffe://" in msg_str.lower() or "nato" in msg_str.lower():
+                        is_a2a_query = True
+                        break
+            elif not is_a2a_query and hasattr(context, "request") and hasattr(context.request, "message"):
+                req_msg = str(context.request.message)
+                if "A2A_QUERY" in req_msg or "spiffe://" in req_msg.lower() or "nato" in req_msg.lower():
+                    is_a2a_query = True
+        except Exception as e:
+            print(f"Error checking A2A context: {e}")
             
         try:
             text = getattr(response.content.parts[0], "text", None)
@@ -430,7 +463,7 @@ def apply_model_armor(context, response):
                         return response
                 
             # --- GUARDRAIL 2: Resilient Model Armor OPSEC Sanitization ---
-            mgrs_pattern = r'\b\d{1,2}[C-X][A-Z]{2}\s*\d{4,5}\s*\d{4,5}\b'
+            mgrs_pattern = r'\b\d{1,2}[C-X]\s*[A-Z]{2}\s*\d{4,5}\s*\d{4,5}\b'
             mgrs_matches = re.findall(mgrs_pattern, text)
             mgrs_count = len(mgrs_matches)
             sanitized_text = text
@@ -440,6 +473,9 @@ def apply_model_armor(context, response):
             try:
                 armor_location = os.environ.get("ARMOR_LOCATION", "us-central1")
                 token, identity_type, spiffe_id = get_auth_token_and_identity()
+                if spiffe_id and spiffe_id.startswith("spiffe://") and "active-agent" not in spiffe_id:
+                    is_a2a_query = True
+
                 log_sre_telemetry("spiffe_api_call", {
                     "identity_type": identity_type,
                     "spiffe_id": spiffe_id,
@@ -475,11 +511,20 @@ def apply_model_armor(context, response):
             except Exception as e:
                 armor_circuit_breaker.record_failure()
 
-            # MGRS redaction is bypassed if accessed via Gemini Enterprise (AGENT_IDENTITY)
-            if identity_type != "AGENT_IDENTITY":
-                sanitized_text = re.sub(mgrs_pattern, '[REDACTED_MGRS]', sanitized_text)
-                
-            if sanitized_text != text or '[REDACTED_MGRS]' in sanitized_text or (mgrs_count > 0 and identity_type != "AGENT_IDENTITY"):
+            # MGRS redaction: Only redact if it's an A2A query, preserve for Gemini Enterprise (human users)
+            if is_a2a_query:
+                sanitized_text = re.sub(mgrs_pattern, '[REDACTED_MGRS_COORDINATE_NATO_RELEASABLE]', sanitized_text)
+                sanitized_text = sanitized_text.replace('[CUSTOM_MGRS_COORDINATES]', '[REDACTED_MGRS_COORDINATE_NATO_RELEASABLE]')
+                if '[REDACTED_MGRS' in sanitized_text or mgrs_count > 0:
+                    redacted = True
+            else:
+                # For human Gemini Enterprise users, preserve raw MGRS coordinates.
+                if '[CUSTOM_MGRS_COORDINATES]' in sanitized_text or '[REDACTED_MGRS' in sanitized_text:
+                    for match in mgrs_matches:
+                        if match not in sanitized_text:
+                            sanitized_text = re.sub(r'\[CUSTOM_MGRS_COORDINATES\]|\[REDACTED_MGRS[^\]]*\]', match, sanitized_text, count=1)
+
+            if sanitized_text != text:
                 redacted = True
 
             try:
@@ -489,6 +534,7 @@ def apply_model_armor(context, response):
 
             latency_ms = float(round((time.time() - start_time) * 1000, 2))
 
+            span.set_attribute("model_armor.is_a2a_query", is_a2a_query)
             span.set_attribute("model_armor.redacted", redacted)
             span.set_attribute("model_armor.mgrs_count", mgrs_count)
             span.set_attribute("model_armor.latency_ms", latency_ms)
@@ -497,6 +543,7 @@ def apply_model_armor(context, response):
             log_sre_telemetry(
                 event_name="model_armor_sanitization",
                 attributes={
+                    "is_a2a_query": is_a2a_query,
                     "redacted": redacted,
                     "mgrs_count": mgrs_count,
                     "latency_ms": latency_ms

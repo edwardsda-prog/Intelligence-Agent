@@ -106,7 +106,7 @@ for i, (desc, prompt) in enumerate(TEST_PROMPTS):
     }
     start_time = time.time()
     try:
-        res = requests.post(query_url, headers=query_headers, json=payload, timeout=30)
+        res = requests.post(query_url, headers=query_headers, json=payload, timeout=60)
         elapsed = time.time() - start_time
         if res.status_code == 200:
             print(f'   ✅ Success ({elapsed:.1f}s)')
