@@ -111,7 +111,7 @@ def instrument_memory_span(memory_tier: str, action: str, conversation_id: str =
         }
     )
 
-def log_memory_event(event_name: str, group_id: str, state_delta: dict[str, Any]):
+def log_memory_event(event_name: str, group_id: str, state_delta: dict[str, Any], latency_ms: float = None):
     """
     Emits structured state_delta logs to stdout for Cloud Logging and SRE monitoring.
     """
@@ -124,6 +124,8 @@ def log_memory_event(event_name: str, group_id: str, state_delta: dict[str, Any]
         "gen_ai_system": "google.adk",
         "state_delta": state_delta
     }
+    if latency_ms is not None:
+        log_entry["latency_ms"] = latency_ms
     print(json.dumps(log_entry))
 
 

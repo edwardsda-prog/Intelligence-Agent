@@ -179,6 +179,7 @@ echo "======================================================================"
 python3 tests/prepopulate_scenario1_intro.py
 python3 tests/prepopulate_scenario2_ops.py
 python3 tests/prepopulate_scenario3_security.py
+python3 tests/prepopulate_scenario4_memory.py
 
 echo ""
 echo "======================================================================"

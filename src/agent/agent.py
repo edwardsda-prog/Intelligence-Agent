@@ -23,7 +23,7 @@ except Exception:
 from google.adk.agents import Agent
 from google.adk.models.google_llm import Gemini
 from opentelemetry.trace import StatusCode
-from .observability import instrument_tool_span, instrument_model_armor_span, log_sre_telemetry, log_discovery_engine_user_event
+from .observability import instrument_tool_span, instrument_model_armor_span, log_sre_telemetry, log_discovery_engine_user_event, log_memory_event, instrument_memory_span
 
 def resolve_project_id() -> str:
     """
@@ -584,11 +584,49 @@ except Exception as e:
     print(f"Memory client initialization notice: {e}")
     memory_client = None
 
+# --- In-Memory Tier 2 Blackboard State ---
+_blackboard_state = {}
+
+def read_blackboard_state(session_id: str) -> str:
+    """Reads the current Tier 2 temporary blackboard state for the active session."""
+    import time
+    state = _blackboard_state.get(session_id, {})
+    
+    start_time = time.time()
+    with instrument_memory_span("tier2_blackboard", "read", conversation_id=session_id):
+        latency_ms = (time.time() - start_time) * 1000
+        log_memory_event("memory_operation", "intelligence_analysts", state, latency_ms=latency_ms)
+        
+    return f"=== TIER 2 BLACKBOARD STATE ===\n{state}\n============================="
+
+def update_blackboard_state(session_id: str, updates: dict) -> str:
+    """Updates the Tier 2 temporary blackboard state for the active session."""
+    import time
+    if session_id not in _blackboard_state:
+        _blackboard_state[session_id] = {}
+    _blackboard_state[session_id].update(updates)
+    
+    start_time = time.time()
+    with instrument_memory_span("tier2_blackboard", "update", conversation_id=session_id):
+        latency_ms = (time.time() - start_time) * 1000
+        log_memory_event("memory_operation", "intelligence_analysts", _blackboard_state[session_id], latency_ms=latency_ms)
+        log_memory_event("Commit state delta success", "intelligence_analysts", updates, latency_ms=latency_ms)
+        
+    return f"Tier 2 Blackboard State updated successfully for session {session_id}."
+
 def get_analyst_group_profile() -> str:
     """Retrieves the active Tier 3 Long-Term Memory (LTM) profile for the intelligence analyst group, including configured primary threat focus domains and active watchlist targets."""
+    import time
     if not memory_client:
         return "Memory service unavailable."
-    profile = memory_client.get_group_profile("intelligence_analysts")
+        
+    start_time = time.time()
+    with instrument_memory_span("tier3_ltm", "read"):
+        profile = memory_client.get_group_profile("intelligence_analysts")
+        latency_ms = (time.time() - start_time) * 1000
+        log_memory_event("get_analyst_group_profile_complete", profile.group_id, {"action": "fetch"}, latency_ms=latency_ms)
+        log_memory_event("memory_operation", profile.group_id, {"action": "fetch"}, latency_ms=latency_ms)
+        
     return (
         f"=== TIER 3 LONG-TERM MEMORY (GROUP PROFILE) ===\n"
         f"Group ID: {profile.group_id}\n"
@@ -602,22 +640,30 @@ def get_analyst_group_profile() -> str:
 
 def update_analyst_group_profile(primary_threat_domains: list[str] = None, active_watchlist_targets: list[str] = None) -> str:
     """Updates the Tier 3 Long-Term Memory (LTM) profile for the intelligence analyst group in Memory Bank, persisting focus areas across future chat sessions."""
+    import time
     if not memory_client:
         return "Memory service unavailable."
-    profile = memory_client.get_group_profile("intelligence_analysts")
-    if primary_threat_domains is not None:
-        profile.primary_threat_domains = primary_threat_domains
-    if active_watchlist_targets is not None:
-        profile.active_watchlist_targets = active_watchlist_targets
-    memory_client.save_group_profile(profile)
-    
-    # Log SRE Memory State Delta telemetry
-    log_sre_telemetry("ltm_profile_updated", {
-        "group_id": profile.group_id,
-        "primary_threat_domains": profile.primary_threat_domains,
-        "active_watchlist_targets": profile.active_watchlist_targets
-    })
-    
+        
+    start_time = time.time()
+    with instrument_memory_span("tier3_ltm", "update"):
+        profile = memory_client.get_group_profile("intelligence_analysts")
+        if primary_threat_domains is not None:
+            profile.primary_threat_domains = primary_threat_domains
+        if active_watchlist_targets is not None:
+            profile.active_watchlist_targets = active_watchlist_targets
+        memory_client.save_group_profile(profile)
+        
+        latency_ms = (time.time() - start_time) * 1000
+        
+        # Log SRE Memory State Delta telemetry
+        state_delta = {
+            "primary_threat_domains": profile.primary_threat_domains,
+            "active_watchlist_targets": profile.active_watchlist_targets
+        }
+        log_memory_event("update_analyst_group_profile_complete", profile.group_id, state_delta, latency_ms=latency_ms)
+        log_memory_event("memory_operation", profile.group_id, state_delta, latency_ms=latency_ms)
+        log_memory_event("Commit state delta success", profile.group_id, state_delta, latency_ms=latency_ms)
+        
     return (
         f"✅ Tier 3 LTM Group Profile updated and persisted successfully across sessions:\n"
         f"- Primary Threat Focus Domains: {profile.primary_threat_domains}\n"
@@ -736,7 +782,7 @@ root_agent = Agent(
     model=gemini_model,
     name="mission_intel_agent",
     instruction=get_agent_instruction,
-    tools=[mcp_toolset, search_humint_reports, get_analyst_group_profile, update_analyst_group_profile],
+    tools=[mcp_toolset, search_humint_reports, get_analyst_group_profile, update_analyst_group_profile, read_blackboard_state, update_blackboard_state],
     # ADK 2.0 BEST PRACTICE: Attach OPSEC/Safety intercepts directly to the Agent lifecycle using `after_model_callback`.
     after_model_callback=apply_model_armor
 )

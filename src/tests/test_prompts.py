@@ -496,6 +496,66 @@ class E2EPromptTestSuite:
             assertions_detail="A2A task delegated and telemetry returned"
         ))
 
+    def run_scenario4_tests(self):
+        print("\n--- Running Scenario 4: Agent Memory Architecture ---")
+        
+        # Test 1: LTM Fetch (Tier 3)
+        p1 = "Review the intelligence_analysts group memory profile. What are the primary threat domains we are tracking?"
+        start = time.time()
+        if self.mode == 'live':
+            resp1 = self._query_agent(p1)
+            elapsed = (time.time() - start) * 1000
+            passed = self._evaluate_with_llm(p1, resp1, "Agent must state the primary threat domains from the intelligence_analysts profile.")
+        else:
+            resp1 = "The primary threat domains tracked by the intelligence_analysts are Cyber and Space."
+            elapsed = (time.time() - start) * 1000
+            passed = True
+            
+        self.results.append(TestCaseResult(
+            scenario="Scenario 4", test_id="S4-P1", name="Session Context (Tier 1 & 3)", category="Student Prompt",
+            learning_point="Implicit context reference loading LTM Profile",
+            prompt_or_query=p1, response=resp1, latency_ms=elapsed, passed=passed,
+            assertions_detail="Agent successfully retrieved the Tier 3 profile"
+        ))
+
+        # Test 2: Blackboard State Update (Tier 2)
+        p2 = "I found a new threat group called KINETIC-VANGUARD. Add this to your temporary blackboard state."
+        start = time.time()
+        if self.mode == 'live':
+            resp2 = self._query_agent(p2, session_id="mem-test-123")
+            elapsed = (time.time() - start) * 1000
+            passed = self._evaluate_with_llm(p2, resp2, "Agent must confirm adding KINETIC-VANGUARD to its temporary blackboard state.")
+        else:
+            resp2 = "I have added KINETIC-VANGUARD to the blackboard state."
+            elapsed = (time.time() - start) * 1000
+            passed = True
+            
+        self.results.append(TestCaseResult(
+            scenario="Scenario 4", test_id="S4-P2", name="Blackboard Mutating (Tier 2)", category="Student Prompt",
+            learning_point="Tracking intra-session entity state via ADK workflows or tools",
+            prompt_or_query=p2, response=resp2, latency_ms=elapsed, passed=passed,
+            assertions_detail="Agent mapped the entity to temporary transaction state"
+        ))
+
+        # Test 3: LTM Bank Persistence (Tier 3)
+        p3 = "Permanently update the intelligence_analysts group memory profile to include KINETIC-VANGUARD in the primary threat domains."
+        start = time.time()
+        if self.mode == 'live':
+            resp3 = self._query_agent(p3, session_id="mem-test-123")
+            elapsed = (time.time() - start) * 1000
+            passed = self._evaluate_with_llm(p3, resp3, "Agent must confirm permanent update of the intelligence_analysts memory profile.")
+        else:
+            resp3 = "I have updated the intelligence_analysts memory profile to include KINETIC-VANGUARD."
+            elapsed = (time.time() - start) * 1000
+            passed = True
+            
+        self.results.append(TestCaseResult(
+            scenario="Scenario 4", test_id="S4-P3", name="LTM Bank Persistence (Tier 3)", category="Student Prompt",
+            learning_point="Asynchronously mutating long-term JSON profile storage",
+            prompt_or_query=p3, response=resp3, latency_ms=elapsed, passed=passed,
+            assertions_detail="Agent used memory tool to mutate global memory footprint"
+        ))
+
     # -------------------------------------------------------------------------
     # Execution & Reporting
     # -------------------------------------------------------------------------
@@ -517,10 +577,11 @@ class E2EPromptTestSuite:
             self.export_reports(total_elapsed)
             return False
 
-        print(f"\n{BOLD}{CYAN}=== Phase 2: Executing Scenario Queries & Interactive Prompts (22 Tests) ==={RESET}")
+        print(f"\n{BOLD}{CYAN}=== Phase 2: Executing Scenario Queries & Interactive Prompts (25 Tests) ==={RESET}")
         self.run_scenario1_tests()
         self.run_scenario2_tests()
         self.run_scenario3_tests()
+        self.run_scenario4_tests()
 
         total_elapsed = time.time() - start_total
         self.print_terminal_summary(total_elapsed)

@@ -77,7 +77,10 @@ def ensure_log_metrics(project_id: str):
         ("model_armor_redactions", "Counter for Model Armor OPSEC redaction events", 'jsonPayload.event_name="model_armor_sanitization" AND jsonPayload.attributes.redacted=true'),
         ("model_armor_latency", "Model Armor sanitization latency in milliseconds", 'jsonPayload.event_name="model_armor_sanitization"'),
         ("spiffe_api_calls", "Counter for SPIFFE vs ADC API calls", 'jsonPayload.event_name="spiffe_api_call" OR jsonPayload.attributes.identity_type:*'),
-        ("execute_bigquery_sql_complete", "Counter for BigQuery SQL query executions", 'jsonPayload.event_name="execute_bigquery_sql_complete"')
+        ("execute_bigquery_sql_complete", "Counter for BigQuery SQL query executions", 'jsonPayload.event_name="execute_bigquery_sql_complete"'),
+        ("memory_bank_updates", "State Deltas & LTM Profile Updates", 'jsonPayload.message="Commit state delta success" OR jsonPayload.event_name="update_analyst_group_profile_complete"'),
+        ("memory_operations_latency", "Memory Operation Latency in ms", 'jsonPayload.event_name="memory_operation" AND jsonPayload.latency_ms:*'),
+        ("memory_profile_fetches", "LTM Profile Fetches", 'jsonPayload.event_name="get_analyst_group_profile_complete"')
     ]
 
     import tempfile
@@ -296,7 +299,8 @@ def deploy_dashboards(project_id: str) -> dict:
     dash_files = [
         ("dashboard_observability.json", "UK Mission Intel Agent - Observability & OpenTelemetry Metrics", "observability"),
         ("dashboard_model_armor.json", "UK Mission Intel Agent - Model Armor & OPSEC Compliance Metrics", "model_armor"),
-        ("dashboard_finops.json", "UK Mission Intel Agent - FinOps Token Burn", "finops")
+        ("dashboard_finops.json", "UK Mission Intel Agent - FinOps Token Burn", "finops"),
+        ("dashboard_memory.json", "UK Mission Intel Agent - Agent Platform Memory Metrics", "memory")
     ]
     deployed_ids = {}
 
@@ -616,6 +620,7 @@ def main():
     obs_id = deployed_dashboards.get("observability", "0d17a8ad-47de-4956-96b3-073f73eb057b")
     ma_id = deployed_dashboards.get("model_armor", "34ae482f-9a69-4ec2-a890-9702d24ed2bc")
     finops_id = deployed_dashboards.get("finops", "unknown")
+    memory_id = deployed_dashboards.get("memory", "unknown")
 
     print("\n======================================================================")
     print("🎉 DEPLOYMENT & VALIDATION LIFECYCLE COMPLETE")
@@ -624,6 +629,7 @@ def main():
     print(f"Observability Dashboard : https://console.cloud.google.com/monitoring/dashboards/builder/{obs_id}?project={args.project}")
     print(f"Model Armor Dashboard   : https://console.cloud.google.com/monitoring/dashboards/builder/{ma_id}?project={args.project}")
     print(f"FinOps Dashboard        : https://console.cloud.google.com/monitoring/dashboards/builder/{finops_id}?project={args.project}")
+    print(f"Memory Dashboard        : https://console.cloud.google.com/monitoring/dashboards/builder/{memory_id}?project={args.project}")
     print(f"Cloud Trace Explorer    : https://console.cloud.google.com/traces/explorer?project={args.project}")
     print(f"Cloud Logging Explorer  : https://console.cloud.google.com/logs/query;query=resource.type%3D%22aiplatform.googleapis.com%2FReasoningEngine%22?project={args.project}")
     print("======================================================================")

@@ -95,3 +95,39 @@ This document provides a storyboard and script for demonstrating the Intelligenc
 *   **Talking Points**:
     *   Explain the **Agent-to-Agent (A2A) Protocol**. The Host Agent securely delegates this query across organizational boundaries to the Partner Agent.
     *   Highlight that the Partner Agent applies its own Model Armor boundary policies, stripping out internal operational details and returning only releasable coalition data. This allows real-time federated intelligence sharing without compromising sovereign data enclaves.
+
+---
+
+## Scenario 4: Agent Memory Architecture (User & Operator Personas)
+**Objective**: Demonstrate the 3-Tier memory implementation (Working Memory, Blackboard State, and Long-Term Memory) mapping to both the user experience and platform operations.
+
+### 1. Session Context (Tier 1 Working Memory) - User Persona
+*   **Action**: Trigger an implicit context reference.
+    *   *Prompt*: "Review the intelligence_analysts group memory profile. What are the primary threat domains we are tracking?"
+*   **Talking Points**:
+    *   The Agent seamlessly retrieves the `intelligence_analysts` LTM profile and outputs the tracked domains.
+
+### 2. Blackboard Mutating (Tier 2 Blackboard State) - User Persona
+*   **Action**: Mutate the session blackboard.
+    *   *Prompt*: "I found a new threat group called KINETIC-VANGUARD. Add this to your temporary blackboard state."
+*   **Talking Points**:
+    *   The agent maps the information to the internal state transaction object without writing to permanent storage.
+
+### 3. LTM Bank Persistence (Tier 3 LTM Memory Bank) - User Persona
+*   **Action**: Asynchronously mutate long-term storage.
+    *   *Prompt*: "Permanently update the intelligence_analysts group memory profile to include KINETIC-VANGUARD in the primary threat domains."
+*   **Talking Points**:
+    *   The Agent uses specific tools to mutate the JSON storage and updates the global memory footprint.
+
+### 4. Memory Telemetry & Dashboards - Operator Persona
+*   **Action**: Verify Memory Operations via Logs Explorer and Cloud Monitoring.
+*   **Talking Points**:
+    *   Operators can monitor State Deltas and LTM fetches in the "UK Mission Intel Agent - Agent Platform Memory Metrics" dashboard.
+    *   Operators can explicitly query Memory State Deltas using Cloud Logging.
+*   **Query**:
+    Navigate to Cloud Logging Explorer and run:
+    ```
+    resource.type="aiplatform.googleapis.com/ReasoningEngine"
+    jsonPayload.event_name="update_analyst_group_profile_complete" OR jsonPayload.message="Commit state delta success"
+    ```
+    *   Show how `state_delta` is embedded in the JSON payload, making it easy to track exact variable mutations (e.g., addition of `KINETIC-VANGUARD`) over time.

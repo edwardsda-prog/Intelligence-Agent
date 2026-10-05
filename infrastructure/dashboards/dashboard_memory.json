@@ -1,0 +1,95 @@
+{
+  "displayName": "UK Mission Intel Agent - Agent Platform Memory Metrics",
+  "mosaicLayout": {
+    "columns": 12,
+    "tiles": [
+      {
+        "xPos": 0,
+        "yPos": 0,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "State Deltas & Blackboard Mutations (Tier 2)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"logging.googleapis.com/user/memory_bank_updates\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE"
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s"
+              }
+            ],
+            "chartOptions": {
+              "mode": "COLOR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 6,
+        "yPos": 0,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "LTM Profile Fetches (Tier 3)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"logging.googleapis.com/user/memory_profile_fetches\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE"
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s"
+              }
+            ],
+            "chartOptions": {
+              "mode": "COLOR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 4,
+        "width": 12,
+        "height": 4,
+        "widget": {
+          "title": "Memory Operation Latency (ms)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"logging.googleapis.com/user/memory_operations_latency\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_MEAN"
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s"
+              }
+            ],
+            "chartOptions": {
+              "mode": "COLOR"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

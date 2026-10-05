@@ -267,6 +267,7 @@ DASHBOARDS=(
   "UK Mission Intel Agent - Observability & OpenTelemetry Metrics"
   "UK Mission Intel Agent - Model Armor & OPSEC Compliance Metrics"
   "UK Mission Intel Agent - FinOps Token Burn"
+  "UK Mission Intel Agent - Agent Platform Memory Metrics"
 )
 
 for DASH_TITLE in "${DASHBOARDS[@]}"; do
