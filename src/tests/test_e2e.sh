@@ -174,5 +174,13 @@ python3 tests/test_prompts.py --live --project="$PROJECT_ID" --location="$LOCATI
 
 echo ""
 echo "======================================================================"
+echo "📊 POPULATING OBSERVABILITY & MEMORY DASHBOARDS"
+echo "======================================================================"
+python3 tests/prepopulate_scenario1_intro.py
+python3 tests/prepopulate_scenario2_ops.py
+python3 tests/prepopulate_scenario3_security.py
+
+echo ""
+echo "======================================================================"
 echo "🏆 END-TO-END WORKSHOP & PROMPT VERIFICATION COMPLETED SUCCESSFULLY!"
 echo "======================================================================"

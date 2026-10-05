@@ -231,10 +231,63 @@ fi
 echo "   ✅ Model Armor and Cloud DLP templates deleted."
 
 # ------------------------------------------------------------------------------
-# 8. SELECTIVE API DEACTIVATION (PRESERVING ANTIGRAVITY & CORE CLOUD APIS)
+# 8. CLOUD LOGGING METRICS & LOG SINK CLEANUP
 # ------------------------------------------------------------------------------
 echo ""
-echo "📌 [8/9] Selectively Disabling Workshop-Specific APIs..."
+echo "📌 [8/11] Cleaning up Custom Cloud Logging Metrics..."
+METRICS=(
+  "agent_execution_latency" "dlp_redaction_count" "document_import_count"
+  "execute_bigquery_sql_complete" "genai_token_usage" "hitl_gate_triggers"
+  "hitl_guardrail_triggers" "memory_bank_updates" "memory_events_by_tier"
+  "memory_operations_latency" "model_armor_latency" "model_armor_pij_blocks"
+  "model_armor_redactions" "nato_classification_compliance" "rag_search_latency"
+  "sanitization_count" "session_state_deltas" "session_turn_count"
+  "spiffe_api_calls" "tool_execution_latency"
+)
+
+for METRIC in "${METRICS[@]}"; do
+  gcloud logging metrics delete "${METRIC}" --project="${PROJECT_ID}" --quiet >/dev/null 2>&1 || true
+done
+echo "   ✅ Custom Log Metrics deleted."
+
+echo "📌 Cleaning up Model Armor Log Sink..."
+gcloud logging sinks delete model_armor_bq_sink --project="${PROJECT_ID}" --quiet >/dev/null 2>&1 || true
+echo "   ✅ Log sink deleted."
+
+echo "📌 Cleaning up Model Armor BigQuery Dataset..."
+bq rm -r -f -d "${PROJECT_ID}:model_armor_logs" 2>/dev/null || true
+echo "   ✅ model_armor_logs dataset deleted."
+
+# ------------------------------------------------------------------------------
+# 9. CLOUD MONITORING DASHBOARDS CLEANUP
+# ------------------------------------------------------------------------------
+echo ""
+echo "📌 [9/11] Cleaning up Cloud Monitoring Dashboards..."
+DASHBOARDS=(
+  "UK Mission Intel Agent - Observability & OpenTelemetry Metrics"
+  "UK Mission Intel Agent - Model Armor & OPSEC Compliance Metrics"
+  "UK Mission Intel Agent - FinOps Token Burn"
+)
+
+for DASH_TITLE in "${DASHBOARDS[@]}"; do
+  echo "   Discovering dashboard: ${DASH_TITLE}..."
+  DASH_ID=$(gcloud monitoring dashboards list --project="${PROJECT_ID}" --format="json" 2>/dev/null | \
+    python3 -c "import sys, json; data=json.load(sys.stdin); res=[d['name'].split('/')[-1] for d in data if d.get('displayName')=='${DASH_TITLE}']; print(res[0] if res else '')" 2>/dev/null || true)
+  
+  if [ -n "${DASH_ID}" ]; then
+    echo "   Deleting Dashboard ID: ${DASH_ID}..."
+    gcloud monitoring dashboards delete "${DASH_ID}" --project="${PROJECT_ID}" --quiet >/dev/null 2>&1 || true
+    echo "   ✅ Dashboard deleted."
+  else
+    echo "   ℹ️ Dashboard not found."
+  fi
+done
+
+# ------------------------------------------------------------------------------
+# 9. SELECTIVE API DEACTIVATION (PRESERVING ANTIGRAVITY & CORE CLOUD APIS)
+# ------------------------------------------------------------------------------
+echo ""
+echo "📌 [9/10] Selectively Disabling Workshop-Specific APIs..."
 echo "   Preserving: aiplatform, discoveryengine, bigquery, run, storage, compute, logging"
 WORKSHOP_APIS_TO_DISABLE=(
   "modelarmor.googleapis.com"
@@ -250,11 +303,11 @@ for API in "${WORKSHOP_APIS_TO_DISABLE[@]}"; do
 done
 
 # ------------------------------------------------------------------------------
-# 9. CLEAN-SLATE VERIFICATION AUDIT
+# 10. CLEAN-SLATE VERIFICATION AUDIT
 # ------------------------------------------------------------------------------
 echo ""
 echo "======================================================================"
-echo "🔍 [9/9] RUNNING CLEAN-SLATE VERIFICATION AUDIT"
+echo "🔍 [10/10] RUNNING CLEAN-SLATE VERIFICATION AUDIT"
 echo "======================================================================"
 
 check_status() {

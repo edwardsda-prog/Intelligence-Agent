@@ -57,6 +57,25 @@ This document provides a storyboard and script for demonstrating the Intelligenc
     *   Show the **Token Burn: Input vs Output** widget mapping `genai_token_usage`.
     *   Explain that Agentic cost runaways are managed by alerting on excessive token loops (e.g., ReAct tool thrashing). By visualizing the exact token consumption per session, Ops can right-size models (e.g., moving from `gemini-1.5-pro` to `gemini-3.8-flash`) and prevent silent execution failures from burning budget.
 
+### 3. Model Armor Audit Logs (BigQuery)
+*   **Action**: Execute an SQL query in the GCP BigQuery console to analyze the raw model armor redaction logs.
+*   **Query**:
+    ```sql
+    SELECT 
+      timestamp,
+      user_prompt AS original_prompt,
+      sanitized_text AS redacted_prompt,
+      pij_match AS jailbreak_detected
+    FROM 
+      `model_armor_logs.model_armor_payload_logger`
+    ORDER BY 
+      timestamp DESC
+    LIMIT 10;
+    ```
+*   **Talking Points**:
+    *   Show how the deployment established a log sink routing Cloud Logging directly into BigQuery.
+    *   Demonstrate comparing the `original_prompt` with the `redacted_prompt` to prove the DLP template intercepted PII/MGRS coordinates before they hit the LLM.
+
 ---
 
 ## Scenario 3: Security & Working with Partners (SecOps & Coalition Persona)
