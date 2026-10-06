@@ -128,4 +128,31 @@ def log_memory_event(event_name: str, group_id: str, state_delta: dict[str, Any]
         log_entry["latency_ms"] = latency_ms
     print(json.dumps(log_entry))
 
-
+def log_model_armor_payload(user_prompt: str, sanitized_text: str, pij_match: bool, action_taken: str):
+    """
+    Writes a custom log to 'model_armor_payload_logger' so that BigQuery Log Sink 
+    can correctly route it to the model_armor_logs.model_armor_payload_logger table.
+    """
+    try:
+        from google.cloud import logging as cloud_logging
+        from google.cloud.logging.resource import Resource
+        import time
+        client = cloud_logging.Client()
+        logger = client.logger("model_armor_payload_logger")
+        
+        # Use a generic global resource type to ensure it gets logged.
+        res = Resource(type="global", labels={})
+        
+        payload = {
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            "event_name": "model_armor_sanitization",
+            "category": "OPSEC",
+            "template_id": "mission_intel_response_armor",
+            "user_prompt": user_prompt,
+            "sanitized_text": sanitized_text,
+            "pij_match": pij_match,
+            "action_taken": action_taken
+        }
+        logger.log_struct(payload, resource=res, severity="INFO")
+    except Exception as e:
+        logger.warning(f"Failed to log model armor payload: {e}")

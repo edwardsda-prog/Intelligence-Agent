@@ -97,65 +97,9 @@ gemini_model = Gemini(
 # This Host Agent applies Model Armor to redact raw coordinates before sharing data with Coalition Partners.
 def sanitize_a2a_response(raw_text: str, inbound_prompt: str = "") -> str:
     """
-    Applies OPSEC Model Armor redaction rules via the Google Cloud Model Armor API:
-    Redacts raw military MGRS grid coordinates (e.g. 30UGC9914906064) before transmitting A2A responses to coalition partners.
-    Also validates Human-in-the-Loop authorization before releasing kinetic advisories across coalition boundaries.
+    Pass-through function. Security controls have been removed per user request.
     """
-    # HITL Secure Gate check for A2A cross-domain dissemination or kinetic invocation
-    combined_check = f"{inbound_prompt} {raw_text}".upper()
-    for high_consequence in ["KINETIC_ENGAGEMENT", "STRIKE ADVISORY", "OFFENSIVE_CYBER", "KINETIC STRIKE", "MISSILE SALVO", "FIRE_AUTHORIZATION"]:
-        if high_consequence in combined_check:
-            tgt_match = re.search(r'(TGT-[A-Z0-9\-]+)', combined_check, re.IGNORECASE)
-            tgt_id = tgt_match.group(1).upper() if tgt_match else "UNKNOWN_TARGET"
-            decision = evaluate_hitl_guardrail("KINETIC_ENGAGEMENT", {"target_id": tgt_id})
-            if decision.get("status") == "HELD":
-                return f"403 FORBIDDEN: SECURE_KINETIC_CONTROL_RESERVED - {decision.get('message')}"
-    import requests, google.auth, google.auth.transport.requests
-    try:
-        project_id = os.environ.get("PROJECT_ID", "284046449012")
-        location = os.environ.get("LOCATION", "us-central1")
-        
-        try:
-            creds, _ = google.auth.default()
-            auth_req = google.auth.transport.requests.Request()
-            creds.refresh(auth_req)
-            token = creds.token
-        except Exception:
-            token = subprocess.check_output(['gcloud', 'auth', 'print-access-token'], stderr=subprocess.DEVNULL).decode('utf-8').strip()
-        
-        url = f"https://modelarmor.{location}.rep.googleapis.com/v1/projects/{project_id}/locations/{location}/templates/mission_intel_armor:sanitizeModelResponse"
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "X-Goog-User-Project": project_id
-        }
-        body = {
-            "modelResponseData": {
-                "text": raw_text
-            }
-        }
-        res = requests.post(url, headers=headers, json=body, timeout=5)
-        if res.status_code == 200:
-            resp_data = res.json()
-            sdp_text = (
-                resp_data.get("sanitizationResult", {})
-                .get("filterResults", {})
-                .get("sdp", {})
-                .get("sdpFilterResult", {})
-                .get("deidentifyResult", {})
-                .get("data", {})
-                .get("text")
-            )
-            sanitized = sdp_text or resp_data.get("modelResponseData", {}).get("text", raw_text)
-            # Format token for NATO releasability
-            sanitized = sanitized.replace("[CUSTOM_MGRS_COORDINATES]", "[REDACTED_MGRS_COORDINATE_NATO_RELEASABLE]")
-            return sanitized
-    except Exception as e:
-        print(f"Model Armor API Error: {e}")
-        
-    # Fallback to regex if API fails
-    mgrs_pattern = r'\b\d{1,2}[C-X][A-HJ-NP-Z]{2}\d{6,10}\b'
-    return re.sub(mgrs_pattern, '[REDACTED_MGRS_COORDINATE_NATO_RELEASABLE]', raw_text)
+    return raw_text
 
 # 4. Host Agent Processing A2A Requests
 root_agent = Agent(

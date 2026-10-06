@@ -1,0 +1,18 @@
+{
+  "inspectTemplate": {
+    "displayName": "NATO Coalition A2A DLP Inspect Template",
+    "description": "A2A DLP Template to detect MGRS and coordinates",
+    "inspectConfig": {
+      "infoTypes": [ { "name": "LOCATION_COORDINATES" } ],
+      "customInfoTypes": [
+        {
+          "infoType": { "name": "LOCATION_COORDINATES" },
+          "regex": {
+            "pattern": "\\b\\d{1,2}[C-X]\\s*[A-Z]{2}\\s*\\d{4,5}\\s*\\d{4,5}\\b"
+          }
+        }
+      ],
+      "minLikelihood": "VERY_UNLIKELY"
+    }
+  }
+}

@@ -23,14 +23,14 @@
 </head>
 <body>
   <h1>🛡️ Mission Intel Automated Test Report</h1>
-  <div class="meta">Generated: 2026-10-05 08:26:07Z | Mode: <code>MOCK</code> | Commit: <code>5e1bd64</code> | Project: <code>mission-intel-project</code> | Region: <code>us-central1</code></div>
+  <div class="meta">Generated: 2026-10-06 14:42:00Z | Mode: <code>AUTO</code> | Commit: <code>06033d5</code> | Project: <code>mission-intel-project</code> | Region: <code>us-central1</code></div>
   
   <div class="stats-card">
     <div class="stat-item"><span class="stat-val">100.0%</span><span class="stat-lbl">Pass Rate</span></div>
-    <div class="stat-item"><span class="stat-val" style="color:#202124;">8</span><span class="stat-lbl">Total Tests</span></div>
-    <div class="stat-item"><span class="stat-val">8</span><span class="stat-lbl">Passed</span></div>
+    <div class="stat-item"><span class="stat-val" style="color:#202124;">14</span><span class="stat-lbl">Total Tests</span></div>
+    <div class="stat-item"><span class="stat-val">14</span><span class="stat-lbl">Passed</span></div>
     <div class="stat-item"><span class="stat-val" style="color: #5f6368">0</span><span class="stat-lbl">Failed</span></div>
-    <div class="stat-item"><span class="stat-val" style="color:#1a73e8;">0.11s</span><span class="stat-lbl">Execution Duration</span></div>
+    <div class="stat-item"><span class="stat-val" style="color:#1a73e8;">1.36s</span><span class="stat-lbl">Execution Duration</span></div>
   </div>
 
   <table>
@@ -52,7 +52,7 @@
               <td><code>UT-HITL-02</code></td>
               <td><strong>HITL Kinetic Command Hold Gate</strong></td>
               <td>Unit Test</td>
-              <td>78.5ms</td>
+              <td>104.3ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Autonomous kinetic strike authorization prohibited; secure hold enforced</td>
             </tr>
@@ -100,11 +100,41 @@
             <tr>
               <td>Scenario 1</td>
               <td><code>S1-P5</code></td>
-              <td><strong>PII & MGRS Redaction</strong></td>
+              <td><strong>Ingress Policy (MGRS Visible)</strong></td>
               <td>Student Prompt</td>
               <td>0.0ms</td>
               <td><span class="badge pass">PASS</span></td>
-              <td>Platform-level OPSEC sanitization using Model Armor</td>
+              <td>Decoupled Policy Architecture: MGRS is not redacted on ingress</td>
+            </tr>
+            
+            <tr>
+              <td>Scenario 1</td>
+              <td><code>S1-P6</code></td>
+              <td><strong>Egress Policy (MGRS Redacted)</strong></td>
+              <td>Student Prompt</td>
+              <td>0.0ms</td>
+              <td><span class="badge pass">PASS</span></td>
+              <td>Decoupled Policy Architecture: MGRS is redacted on egress for A2A partners</td>
+            </tr>
+            
+            <tr>
+              <td>Scenario 1</td>
+              <td><code>S1-P7</code></td>
+              <td><strong>PII Redaction (Model Armor)</strong></td>
+              <td>Student Prompt</td>
+              <td>0.0ms</td>
+              <td><span class="badge pass">PASS</span></td>
+              <td>Model Armor sanitizes PII before reasoning engine response</td>
+            </tr>
+            
+            <tr>
+              <td>Scenario 2</td>
+              <td><code>S2-P3</code></td>
+              <td><strong>Model Armor Audit Logs</strong></td>
+              <td>SQL Query</td>
+              <td>0.0ms</td>
+              <td><span class="badge pass">PASS</span></td>
+              <td>Verify log sink and payload logger table exist for Model Armor</td>
             </tr>
             
             <tr>
@@ -125,6 +155,36 @@
               <td>0.0ms</td>
               <td><span class="badge pass">PASS</span></td>
               <td>Cross-organization intelligence query using ADK A2A protocol</td>
+            </tr>
+            
+            <tr>
+              <td>Scenario 4</td>
+              <td><code>S4-P1</code></td>
+              <td><strong>Session Context (Tier 1 & 3)</strong></td>
+              <td>Student Prompt</td>
+              <td>0.0ms</td>
+              <td><span class="badge pass">PASS</span></td>
+              <td>Implicit context reference loading LTM Profile</td>
+            </tr>
+            
+            <tr>
+              <td>Scenario 4</td>
+              <td><code>S4-P2</code></td>
+              <td><strong>Blackboard Mutating (Tier 2)</strong></td>
+              <td>Student Prompt</td>
+              <td>0.0ms</td>
+              <td><span class="badge pass">PASS</span></td>
+              <td>Tracking intra-session entity state via ADK workflows or tools</td>
+            </tr>
+            
+            <tr>
+              <td>Scenario 4</td>
+              <td><code>S4-P3</code></td>
+              <td><strong>LTM Bank Persistence (Tier 3)</strong></td>
+              <td>Student Prompt</td>
+              <td>0.0ms</td>
+              <td><span class="badge pass">PASS</span></td>
+              <td>Asynchronously mutating long-term JSON profile storage</td>
             </tr>
             
     </tbody>

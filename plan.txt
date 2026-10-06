@@ -1,0 +1,7 @@
+1. In `infrastructure/setup_infrastructure.sh`:
+   a. Fix Model Armor SQL Audit: Change the log filter for `model_armor_bq_sink` to match actual Model Armor logs (e.g., `resource.type="modelarmor.googleapis.com"` or `logName="projects/antig-dave/logs/modelarmor.googleapis.com%2Fpayload"`). Wait, the Model Armor payload logs for Vertex AI and extensions have specific log names. Actually, I need to look up the exact logName for Model Armor logs. Or I can just set filter to `resource.type="modelarmor.googleapis.com"`.
+   b. Add the `system_logs` dataset creation and BigQuery log sink for ADK Telemetry. The filter should capture ADK logs (e.g., `jsonPayload.gen_ai_system="google.adk"` or similar, exporting to `system_logs` dataset).
+2. In `src/tests/test_e2e.sh`:
+   a. Remove `../infrastructure/setup_infrastructure.sh` from execution.
+   b. Remove `python3 ../infrastructure/deploy_agent.py` from execution.
+   c. Adjust so `test_e2e.sh` assumes the agent is already deployed and just queries the agent. It can get `AGENT_ENGINE_ID` from the reasoning engines list.

@@ -19,7 +19,7 @@ echo "----------------------------------------------------------------------"
 
 # Execute the base infrastructure provisioning
 echo "📌 Running Base Infrastructure Provisioning..."
-./infrastructure/provision_all.sh
+./infrastructure/setup_infrastructure.sh
 
 # Execute the core deployment python script
 python3 infrastructure/deploy_agent.py $ARGS

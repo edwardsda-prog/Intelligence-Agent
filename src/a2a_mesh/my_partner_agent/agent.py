@@ -63,7 +63,19 @@ def query_learning_lab_agent_via_a2a(prompt: str) -> str:
     if use_remote:
         try:
             token = get_oauth_token()
-            url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{REASONING_ENGINE_ID}:streamQuery"
+            
+            # Dynamically discover the latest Reasoning Engine
+            discovery_url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines"
+            discovery_headers = {"Authorization": f"Bearer {token}"}
+            res = requests.get(discovery_url, headers=discovery_headers)
+            res.raise_for_status()
+            engines = res.json().get('reasoningEngines', [])
+            if not engines:
+                raise ValueError("No Reasoning Engines found deployed in the project.")
+            latest_engine = sorted(engines, key=lambda x: x.get('createTime', ''), reverse=True)[0]
+            engine_id = latest_engine['name'].split('/')[-1]
+            
+            url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{engine_id}:streamQuery"
             headers = {
                 "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json"

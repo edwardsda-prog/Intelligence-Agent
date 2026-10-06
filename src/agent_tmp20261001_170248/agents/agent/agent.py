@@ -198,7 +198,7 @@ except Exception as e:
 # Queries the Discovery Engine endpoint to retrieve text snippets and metadata from PDF field reports.
 @retry_with_backoff(max_attempts=3, initial_delay=1.0, factor=2.0, circuit_breaker=discovery_circuit_breaker, fallback=fallback_humint)
 def search_humint_reports(query: str) -> str:
-    """Searches all 10 unstructured HUMINT intelligence PDF reports (HUM-445 through HUM-454) for field narratives, target details, optical/radar tactical crops, and source reliability.
+    """Searches all unstructured HUMINT intelligence PDF reports for field narratives, target details, optical/radar tactical crops, and source reliability.
     
     IMPORTANT: This function retrieves up to 15 matching reports in a SINGLE call. Execute a broad search query (e.g. 'all HUMINT reports' or 'HUM-445 HUM-451') to fetch all required document snippets simultaneously in sub-second speed. Do NOT call this function sequentially in a loop.
     

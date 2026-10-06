@@ -93,14 +93,14 @@ echo "✅ Phase 1 Passed: All unit tests verified successfully. Proceeding with 
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 0: Provisioning Unified Environment, Gemini Enterprise & IAM Security ==="
-./infrastructure/setup.sh
+../infrastructure/setup_infrastructure.sh
 
 # ------------------------------------------------------------------------------
 # STEP 1: Data Foundations & BigQuery
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 1: Testing BigQuery Setup ==="
-bq query --location=us-central1 --use_legacy_sql=false --project_id="$PROJECT_ID" < infrastructure/schemas/setup_dataset.sql > /dev/null 2>&1
+bq query --location=us-central1 --use_legacy_sql=false --project_id="$PROJECT_ID" < ../infrastructure/schemas/setup_dataset.sql > /dev/null 2>&1
 ROW_COUNT=$(bq query --location=us-central1 --use_legacy_sql=false --format=csv "SELECT COUNT(*) FROM \`${PROJECT_ID}.mission_data.radar_telemetry\`" | tail -n 1)
 echo "✅ BigQuery dataset created. radar_telemetry row count: $ROW_COUNT (Expected: 8)"
 
@@ -130,7 +130,7 @@ echo "✅ Cloud Run MCP Server URL: $CLOUD_RUN_URL"
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 3: Setup Unstructured Datastore (HUMINT PDFs) ==="
-./infrastructure/setup_discovery_engine.sh
+# Datastore setup handled by setup_infrastructure.sh
 
 # ------------------------------------------------------------------------------
 # STEP 4: Setup RAG (Scenario 8)
@@ -148,18 +148,14 @@ fi
 # ------------------------------------------------------------------------------
 echo ""
 echo "=== STEP 5: Setup Model Armor ==="
-./infrastructure/security/setup_model_armor.sh
+# Model Armor setup handled by setup_infrastructure.sh
 
 # ------------------------------------------------------------------------------
-# STEP 6: Deploy Final Agent
+# STEP 6: Deploy Final Agent (Removed per user request)
 # ------------------------------------------------------------------------------
-echo ""
-echo "=== STEP 6: Deploying Final Consolidated Agent ==="
-./final_agent/deploy.sh
-echo "✅ Final Agent deployed."
 
-# Export the AGENT_ENGINE_ID if deploy.sh doesn't export it globally
-# We can find it by querying ReasoningEngines or from Discovery Engine agents list
+# We assume the agent is already deployed and AGENT_ENGINE_ID is exported.
+# Or we find it dynamically as before.
 RE_NAME=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
   "https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/reasoningEngines" | \
   python3 -c "import sys, json; data = json.load(sys.stdin); res = (data.get('reasoningEngines') or [{}])[0].get('name', ''); print(res if res else '')")

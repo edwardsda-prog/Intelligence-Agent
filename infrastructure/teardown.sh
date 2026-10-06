@@ -10,11 +10,18 @@ if [ -d "/home/aguser/Documents/Research/bin" ]; then
     export PATH="/home/aguser/Documents/Research/bin:$PATH"
 fi
 
-if [ -d "/home/aguser/.config/gcloud" ]; then
-    mkdir -p /tmp/gcloud_config
-    cp -u /home/aguser/.config/gcloud/credentials.db /tmp/gcloud_config/ 2>/dev/null || true
-    cp -u /home/aguser/.config/gcloud/access_tokens.db /tmp/gcloud_config/ 2>/dev/null || true
-    cp -u /home/aguser/.config/gcloud/application_default_credentials.json /tmp/gcloud_config/ 2>/dev/null || true
+mkdir -p /tmp/gcloud_config
+GCLOUD_SOURCE="${HOME}/.config/gcloud"
+if [ ! -d "$GCLOUD_SOURCE" ] && [ -d "/home/aguser/.config/gcloud" ]; then
+    GCLOUD_SOURCE="/home/aguser/.config/gcloud"
+fi
+
+if [ -d "$GCLOUD_SOURCE" ]; then
+    cp -ru "$GCLOUD_SOURCE/configurations" /tmp/gcloud_config/ 2>/dev/null || true
+    cp -u "$GCLOUD_SOURCE/active_config" /tmp/gcloud_config/ 2>/dev/null || true
+    cp -u "$GCLOUD_SOURCE/credentials.db" /tmp/gcloud_config/ 2>/dev/null || true
+    cp -u "$GCLOUD_SOURCE/access_tokens.db" /tmp/gcloud_config/ 2>/dev/null || true
+    cp -u "$GCLOUD_SOURCE/application_default_credentials.json" /tmp/gcloud_config/ 2>/dev/null || true
 fi
 export CLOUDSDK_CONFIG="${CLOUDSDK_CONFIG:-/tmp/gcloud_config}"
 export PROJECT_ID="${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}"
@@ -256,6 +263,7 @@ echo "   ✅ Log sink deleted."
 
 echo "📌 Cleaning up Model Armor BigQuery Dataset..."
 bq rm -r -f -d "${PROJECT_ID}:model_armor_logs" 2>/dev/null || true
+    bq rm -r -f -d "${PROJECT_ID}:system_logs" 2>/dev/null || true
 echo "   ✅ model_armor_logs dataset deleted."
 
 # ------------------------------------------------------------------------------

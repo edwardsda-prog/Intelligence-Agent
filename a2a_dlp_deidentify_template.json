@@ -1,0 +1,24 @@
+{
+  "deidentifyTemplate": {
+    "displayName": "NATO Coalition A2A DLP Deidentify Template",
+    "description": "Redacts MGRS and coordinates to InfoType Tokens",
+    "deidentifyConfig": {
+      "infoTypeTransformations": {
+        "transformations": [
+          {
+            "infoTypes": [
+              { "name": "LOCATION_COORDINATES" }
+            ],
+            "primitiveTransformation": {
+              "replaceConfig": {
+                 "newValue": {
+                    "stringValue": "[REDACTED_MGRS_COORDINATE_NATO_RELEASABLE]"
+                 }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
