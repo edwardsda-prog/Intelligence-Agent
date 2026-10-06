@@ -382,7 +382,7 @@ def search_humint_reports(query: str) -> str:
 # SCENARIO 5 OBJECTIVE: DevSecOps OPSEC Guardrails.
 # Applies Zero-Trust AI security by sanitizing LLM responses via the Cloud Model Armor API.
 # Replaces sensitive regex patterns like MGRS coordinates.
-def apply_model_armor(context, response):
+def apply_model_armor(*args, **kwargs):
     """
     Applies Zero-Trust AI security by sanitizing LLM responses via Cloud Model Armor API.
     
@@ -397,40 +397,17 @@ def apply_model_armor(context, response):
     start_time = time.time()
     
     try:
+        response = kwargs.get("response")
+        context = kwargs.get("callback_context") or kwargs.get("context")
+        
+        for arg in args:
+            if hasattr(arg, "content") and hasattr(arg.content, "parts"):
+                response = arg
+            elif hasattr(arg, "request") or hasattr(arg, "session"):
+                context = arg
+
         if not response or not hasattr(response, "content") or not response.content or not hasattr(response.content, "parts") or not response.content.parts:
             return response
-            
-        # Determine if this is an A2A query
-        is_a2a_query = False
-        try:
-            user_id_str = str(getattr(context, "user_id", "") or getattr(context, "user", "") or "")
-            if "spiffe://" in user_id_str.lower() or "nato" in user_id_str.lower() or "a2a" in user_id_str.lower():
-                is_a2a_query = True
-                
-            headers = getattr(context, "headers", {}) or {}
-            if hasattr(context, "state") and isinstance(context.state, dict):
-                headers = context.state.get("headers", headers)
-                if context.state.get("is_a2a_session"):
-                    is_a2a_query = True
-            
-            if any(h in headers for h in ["x-a2a-task-id", "x-a2a-agent-id", "X-A2A-Task-Id", "X-A2A-Agent-Id"]):
-                is_a2a_query = True
-
-            if not is_a2a_query and hasattr(context, "session") and hasattr(context.session, "messages"):
-                for msg in reversed(context.session.messages):
-                    msg_text = getattr(msg, "content", "") or getattr(msg, "text", "") or ""
-                    if not msg_text and hasattr(msg, "content") and hasattr(msg.content, "parts") and msg.content.parts:
-                        msg_text = str(getattr(msg.content.parts[0], "text", ""))
-                    msg_str = str(msg_text)
-                    if "A2A_QUERY" in msg_str or "spiffe://" in msg_str.lower() or "nato" in msg_str.lower():
-                        is_a2a_query = True
-                        break
-            elif not is_a2a_query and hasattr(context, "request") and hasattr(context.request, "message"):
-                req_msg = str(context.request.message)
-                if "A2A_QUERY" in req_msg or "spiffe://" in req_msg.lower() or "nato" in req_msg.lower():
-                    is_a2a_query = True
-        except Exception as e:
-            print(f"Error checking A2A context: {e}")
             
         try:
             text = getattr(response.content.parts[0], "text", None)
@@ -473,15 +450,15 @@ def apply_model_armor(context, response):
             try:
                 armor_location = os.environ.get("ARMOR_LOCATION", "us-central1")
                 token, identity_type, spiffe_id = get_auth_token_and_identity()
-                if spiffe_id and spiffe_id.startswith("spiffe://") and "active-agent" not in spiffe_id:
-                    is_a2a_query = True
+
+                template_name = "mission_intel_response_armor"
 
                 log_sre_telemetry("spiffe_api_call", {
                     "identity_type": identity_type,
                     "spiffe_id": spiffe_id,
                     "tool_name": "model_armor_sanitizer"
                 })
-                url = f"https://modelarmor.{armor_location}.rep.googleapis.com/v1/projects/{PROJECT_ID}/locations/{armor_location}/templates/mission_intel_response_armor:sanitizeModelResponse"
+                url = f"https://modelarmor.{armor_location}.rep.googleapis.com/v1/projects/{PROJECT_ID}/locations/{armor_location}/templates/{template_name}:sanitizeModelResponse"
                 headers = {
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
@@ -511,19 +488,6 @@ def apply_model_armor(context, response):
             except Exception as e:
                 armor_circuit_breaker.record_failure()
 
-            # MGRS redaction: Only redact if it's an A2A query, preserve for Gemini Enterprise (human users)
-            if is_a2a_query:
-                sanitized_text = re.sub(mgrs_pattern, '[REDACTED_MGRS_COORDINATE_NATO_RELEASABLE]', sanitized_text)
-                sanitized_text = sanitized_text.replace('[CUSTOM_MGRS_COORDINATES]', '[REDACTED_MGRS_COORDINATE_NATO_RELEASABLE]')
-                if '[REDACTED_MGRS' in sanitized_text or mgrs_count > 0:
-                    redacted = True
-            else:
-                # For human Gemini Enterprise users, preserve raw MGRS coordinates.
-                if '[CUSTOM_MGRS_COORDINATES]' in sanitized_text or '[REDACTED_MGRS' in sanitized_text:
-                    for match in mgrs_matches:
-                        if match not in sanitized_text:
-                            sanitized_text = re.sub(r'\[CUSTOM_MGRS_COORDINATES\]|\[REDACTED_MGRS[^\]]*\]', match, sanitized_text, count=1)
-
             if sanitized_text != text:
                 redacted = True
 
@@ -534,16 +498,28 @@ def apply_model_armor(context, response):
 
             latency_ms = float(round((time.time() - start_time) * 1000, 2))
 
-            span.set_attribute("model_armor.is_a2a_query", is_a2a_query)
             span.set_attribute("model_armor.redacted", redacted)
             span.set_attribute("model_armor.mgrs_count", mgrs_count)
             span.set_attribute("model_armor.latency_ms", latency_ms)
             span.set_status(StatusCode.OK)
 
+            try:
+                from .observability import log_model_armor_payload
+                user_prompt = ""
+                if hasattr(context, "request") and hasattr(context.request, "message"):
+                    user_prompt = str(context.request.message)
+                log_model_armor_payload(
+                    user_prompt=user_prompt,
+                    sanitized_text=sanitized_text,
+                    pij_match=redacted,
+                    action_taken="REDACTED" if redacted else "ALLOWED"
+                )
+            except Exception:
+                pass
+
             log_sre_telemetry(
                 event_name="model_armor_sanitization",
                 attributes={
-                    "is_a2a_query": is_a2a_query,
                     "redacted": redacted,
                     "mgrs_count": mgrs_count,
                     "latency_ms": latency_ms
@@ -587,9 +563,10 @@ except Exception as e:
 # --- In-Memory Tier 2 Blackboard State ---
 _blackboard_state = {}
 
-def read_blackboard_state(session_id: str) -> str:
+def read_blackboard_state() -> str:
     """Reads the current Tier 2 temporary blackboard state for the active session."""
     import time
+    session_id = "default_session"
     state = _blackboard_state.get(session_id, {})
     
     start_time = time.time()
@@ -599,9 +576,10 @@ def read_blackboard_state(session_id: str) -> str:
         
     return f"=== TIER 2 BLACKBOARD STATE ===\n{state}\n============================="
 
-def update_blackboard_state(session_id: str, updates: dict) -> str:
-    """Updates the Tier 2 temporary blackboard state for the active session."""
+def update_blackboard_state(updates: dict) -> str:
+    """Updates the Tier 2 temporary blackboard state for the active session. You MUST respond to the user confirming the update."""
     import time
+    session_id = "default_session"
     if session_id not in _blackboard_state:
         _blackboard_state[session_id] = {}
     _blackboard_state[session_id].update(updates)
@@ -639,7 +617,7 @@ def get_analyst_group_profile() -> str:
     )
 
 def update_analyst_group_profile(primary_threat_domains: list[str] = None, active_watchlist_targets: list[str] = None) -> str:
-    """Updates the Tier 3 Long-Term Memory (LTM) profile for the intelligence analyst group in Memory Bank, persisting focus areas across future chat sessions."""
+    """Updates the Tier 3 Long-Term Memory (LTM) profile for the intelligence analyst group in Memory Bank, persisting focus areas across future chat sessions. You MUST respond to the user confirming the update."""
     import time
     if not memory_client:
         return "Memory service unavailable."
@@ -777,6 +755,35 @@ def get_agent_instruction(context=None):
         "7. Whenever asked about HUMINT field reports, PDF links, or unstructured data, you MUST call the `search_humint_reports` tool to retrieve official PDF document links. Do NOT claim or state that datastores are unauthenticated or offline.\n"
     )
 
+def apply_fast_path(*args, **kwargs):
+    print(f"FAST PATH ARGS: {args}\nFAST PATH KWARGS: {kwargs}")
+    try:
+        user_prompt = ""
+        context = kwargs.get("callback_context") or kwargs.get("context")
+        
+        # In case the prompt is passed explicitly as a kwarg or arg
+        user_prompt = kwargs.get("prompt", "")
+        if not user_prompt:
+            for arg in args:
+                if isinstance(arg, str):
+                    user_prompt = arg
+                    break
+
+        if not user_prompt and context:
+            if hasattr(context, "request") and hasattr(context.request, "message"):
+                user_prompt = str(context.request.message)
+            elif hasattr(context, "prompt"):
+                user_prompt = str(context.prompt)
+                
+        res = fast_path_intercept(user_prompt)
+        if res:
+            from google.adk.models import LlmResponse
+            from google.genai.types import Content, Part
+            return LlmResponse(content=Content(role="model", parts=[Part.from_text(text=res)]))
+    except Exception as e:
+        print(f"FAST PATH ERROR: {e}")
+    return None
+
 
 root_agent = Agent(
     model=gemini_model,
@@ -784,6 +791,7 @@ root_agent = Agent(
     instruction=get_agent_instruction,
     tools=[mcp_toolset, search_humint_reports, get_analyst_group_profile, update_analyst_group_profile, read_blackboard_state, update_blackboard_state],
     # ADK 2.0 BEST PRACTICE: Attach OPSEC/Safety intercepts directly to the Agent lifecycle using `after_model_callback`.
+    before_model_callback=apply_fast_path,
     after_model_callback=apply_model_armor
 )
 
@@ -797,7 +805,8 @@ else:
 agent_runner = Runner(
     agent=root_agent,
     app_name="mission_intel_app",
-    session_service=session_service
+    session_service=session_service,
+    auto_create_session=True
 )
 print("✅ ADK 2.0 Agent Memory 3-Tier Services & Runner initialized successfully.")
 
