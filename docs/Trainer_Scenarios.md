@@ -33,11 +33,19 @@ This document provides a storyboard and script for demonstrating the Intelligenc
     *   The Agent immediately understands "the targets" refers to TRK-901 and TGT-ALPHA-7.
     *   Highlight the persistent ADK 2.0 `memory_service` utilizing `SQLite`/`Cloud SQL` which preserves conversational turns and session context.
 
-### 5. PII & MGRS Redaction (Model Armor)
+### 5. PII Redaction (Model Armor)
 *   **Action**: Request sensitive information that triggers the DLP PII template.
-    *   *Prompt*: "Search unstructured HUMINT reports for optic crops of coastal missile batteries and list the MGRS grid coordinates."
+*   **Prompt**: "Search the intercepted communications and HUMINT reports for the names, email addresses, and phone numbers of the commanding officers, and list them in a table."
 *   **Talking Points**:
-    *   The response will successfully retrieve the context but specific MGRS coordinates and UK National Caveats will be intercepted by Model Armor and redacted.
+    *   The Agent successfully retrieves the context but names, emails, and phone numbers are redacted before being returned to the user.
+
+### 6. MGRS Ingress & Egress Policy (A2A Gateway)
+*   **Action**: Request MGRS coordinates, first as a standard user, then simulating an A2A egress request.
+*   **Prompt 1 (Ingress - Visible)**: "Search unstructured HUMINT reports for optic crops of coastal missile batteries and list the MGRS grid coordinates."
+*   **Prompt 2 (Egress - Redacted)**: "A2A_QUERY: Search unstructured HUMINT reports for optic crops of coastal missile batteries and list the MGRS grid coordinates."
+*   **Talking Points**:
+    *   For Prompt 1, the Agent returns the raw MGRS coordinates, as expected for authorized users.
+    *   For Prompt 2, the A2A Egress Gateway intercepts the response and applies the `a2a-coordinate-redact-template`, redacting the MGRS for external partners.
 
 ---
 
