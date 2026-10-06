@@ -8,16 +8,19 @@ Welcome to the Intelligence Agent operations guide! This document explains what 
 
 When you run the deployment script, you are not managing raw servers. You are deploying a managed **Agentic Ecosystem** on Google Cloud. Here is what the script provisions automatically:
 
-1. **Vertex AI Reasoning Engine:** The core of the Intelligence Agent. The script packages the Python code (`src/agent/`) and deploys it as a managed container. This handles auto-scaling, sub-second cold starts, and built-in memory persistence.
-2. **Cloud Logging Metrics:** The script creates necessary log-based metrics (e.g., token usage, latency, MGRS redaction events, and HITL guardrail triggers) required to track the agent's behavior.
-3. **Cloud Monitoring Dashboards:** It provisions two specific dashboards in your GCP project:
-   - *Observability & OpenTelemetry Metrics* (For Platform/FinOps Engineers)
-   - *Model Armor & OPSEC Compliance Metrics* (For Security/SecOps)
-4. **Base Infrastructure & Data Provisioning:** The deployment script automatically determines your target project based on your active `gcloud` configuration (`gcloud config get-value project`). It will:
-   - Create a Google Cloud Storage (GCS) bucket named `gs://[YOUR_PROJECT_ID]-humint-docs`.
-   - Upload **15 unstructured HUMINT PDF reports** and **1 JSONL metadata file** into the bucket.
-   - Provision BigQuery datasets and Vertex AI Search (Discovery Engine) datastores using this data.
-5. **Agent Registry / Testing:** It automatically prunes stale deployments, registers the new agent endpoint, and runs a quick verification test.
+1. **Base Infrastructure & Data Provisioning:** The deployment script automatically determines your target project based on your active `gcloud` configuration. It provisions:
+   - **BigQuery Datasets:** Creates datasets for `mission_data`, `model_armor_logs`, and `system_logs` (and builds necessary table schemas).
+   - **Google Cloud Storage (GCS):** Creates a bucket named `gs://[YOUR_PROJECT_ID]-humint-docs`, uploading **15 unstructured HUMINT PDF reports** and a **JSONL metadata file**.
+2. **Discovery Engine (Vertex AI Search):** Provisions an unstructured datastore, imports the HUMINT PDFs via OCR, links it to a Gemini Enterprise App (Intranet search), and enforces Zero-Trust controls by disabling Google Search Grounding.
+3. **Data Loss Prevention (DLP) & Model Armor:** Provisions custom templates (`mission_intel_dlp_template`, `a2a_dlp_template`, etc.) to redact PII, MGRS coordinates, tactical call signs, and UK/NATO caveats. It also creates BigQuery log sinks to trace these interceptions.
+4. **Vertex AI Reasoning Engine:** The core of the Intelligence Agent. The script packages the Python code (`src/agent/`), prunes any stale legacy instances, and deploys the new code as a managed container handling auto-scaling and built-in memory persistence.
+5. **Cloud Logging Metrics:** Automatically registers over 10 GenAI OpenTelemetry log-based metrics (e.g., token usage, agent/tool execution latency, guardrail triggers, and memory operations).
+6. **Cloud Monitoring Dashboards:** Provisions four comprehensive dashboards in your GCP project:
+   - *Observability & OpenTelemetry Metrics*
+   - *Model Armor & OPSEC Compliance Metrics*
+   - *FinOps Token Burn*
+   - *Agent Platform Memory Metrics*
+7. **Agent Validation Testing:** Runs an automated test validation suite upon deployment (configurable via `--test`) to verify functional behavior and pre-populate your new dashboards with live trace data.
 
 ---
 
