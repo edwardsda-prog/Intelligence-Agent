@@ -94,3 +94,30 @@ If you need to evaluate the agent's performance against the 7 Quality Dimensions
    ./evaluate.sh
    ```
 This script will set up the necessary environment variables and invoke the evaluation against the Golden Data Set, outputting the results to your console.
+
+---
+
+## 7. Teardown & Environment Cleanup
+
+When you are finished with the workshop or demonstration, you can safely decommission the deployed infrastructure to prevent ongoing billing charges. We have provided a comprehensive teardown script that specifically targets workshop resources while preserving core Google Cloud APIs.
+
+1. Ensure you are authenticated and have your project configured.
+2. Run the teardown script from the root directory:
+   ```bash
+   ./infrastructure/teardown.sh
+   ```
+
+**What this script deletes from GCP (Verbose Summary):**
+
+* **BigQuery Datasets:** Deletes `mission_data`, `model_armor_logs`, and `system_logs` datasets.
+* **Cloud Run Services:** Deletes `bigquery-mcp-server`, `remote-mcp-server`, and `mission-intel-gateway`.
+* **Agent Gateway & Registry:** Deletes the `mission-intel-gateway` network service and the `bigquery-mcp` / `mission-intel-a2a-host` Agent Registry entries.
+* **Vertex AI Reasoning Engines:** Discovers and deletes all deployed Reasoning Engines in the region.
+* **Cloud Storage Buckets:** Deletes `gs://[PROJECT_ID]-humint-docs` and `gs://[PROJECT_ID]-mission-docs` including all their contents.
+* **Discovery Engine (Vertex AI Search):** Dynamically discovers and deletes all default collection Apps (Engines) and DataStores.
+* **Model Armor & Cloud DLP:** Deletes the `mission_intel_armor` template, as well as the `mission_intel_dlp_template` and `mission_intel_dlp_deidentify_template` DLP templates.
+* **Cloud Logging Metrics & Sinks:** Removes the custom GenAI OpenTelemetry log-based metrics (e.g., token usage, latency, triggers) and the `model_armor_bq_sink`.
+* **Cloud Monitoring Dashboards:** Deletes the custom UK Mission Intel Agent dashboards (Observability, Model Armor, FinOps, and Memory).
+* **Selectively Disables APIs:** Disables workshop-specific APIs (`modelarmor.googleapis.com`, `agentregistry.googleapis.com`, `dlp.googleapis.com`, `networkservices.googleapis.com`) while intentionally preserving core APIs (`aiplatform`, `discoveryengine`, `bigquery`, `run`, `storage`).
+
+The script finishes by running a **Clean-Slate Verification Audit** to confirm all specified resources were successfully decommissioned.
